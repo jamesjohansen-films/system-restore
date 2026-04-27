@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './MemoryCore.css'
+import TerminalSelect from '../../TerminalSelect/TerminalSelect'
 
 // ── Memory fragments ──────────────────────────────────────────────────────────
 // Shown scrambled — player sorts them in chronological order (by timestamp).
@@ -158,18 +159,18 @@ export default function MemoryCore({ onSolve, onBack }) {
                 <div className="mc-frag-comp terminal-text terminal-text--dim">
                   COMPARTMENT: {f.compartment}
                 </div>
-                <select
-                  className="mc-pos-select terminal-text"
+                <TerminalSelect
                   value={positions[f.id]}
-                  onChange={e => setPos(f.id, e.target.value)}
-                  style={positions[f.id] ? { borderColor: '#2a4a7a', color: '#4a6a9a' } : {}}
-                >
-                  <option value="">— POSITION —</option>
-                  <option value="1">1 — EARLIEST</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4 — LATEST</option>
-                </select>
+                  onChange={val => setPos(f.id, val)}
+                  placeholder="— POSITION —"
+                  disabled={sortSolved}
+                  options={[
+                    { value: '1', label: '1 — EARLIEST' },
+                    { value: '2', label: '2' },
+                    { value: '3', label: '3' },
+                    { value: '4', label: '4 — LATEST' },
+                  ]}
+                />
               </div>
             ))}
           </div>

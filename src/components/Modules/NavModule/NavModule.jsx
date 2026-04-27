@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './NavModule.css'
+import TerminalSelect from '../../TerminalSelect/TerminalSelect'
 
 // ── Map constants ─────────────────────────────────────────────────────────────
 const MAP_W = 320
@@ -268,18 +269,14 @@ function TriSection({ pulsars, signals, ship, scanLabel, onComplete }) {
                 <polyline points={makeWaveform(sig.period)} fill="none"
                   stroke={sig.color} strokeWidth={0.9} strokeOpacity={0.75}/>
               </svg>
-              <select
-                className="nav-select terminal-text"
+              <TerminalSelect
                 value={selections[sig.id]}
-                onChange={e => select(sig.id, e.target.value)}
+                onChange={val => select(sig.id, val)}
+                placeholder="— IDENTIFY SOURCE —"
                 disabled={solved || triangulating}
-                style={selections[sig.id] ? { borderColor: sig.color, color: sig.color } : {}}
-              >
-                <option value="">— IDENTIFY SOURCE —</option>
-                {pulsars.map(p => (
-                  <option key={p.id} value={p.id}>{p.id}</option>
-                ))}
-              </select>
+                accentColor={sig.color}
+                options={pulsars.map(p => ({ value: p.id, label: p.id }))}
+              />
             </div>
           ))}
         </div>

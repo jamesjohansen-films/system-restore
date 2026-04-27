@@ -1,0 +1,96 @@
+.t-select {
+  position: relative;
+  width: 100%;
+}
+
+/* ── Trigger button ── */
+.t-select__trigger {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  background: #080808;
+  border: 1px solid #282828;
+  color: #444;
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  text-align: left;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.t-select__trigger:hover:not(:disabled) {
+  border-color: #404040;
+  color: #888;
+}
+
+.t-select__trigger--open {
+  border-color: #404040 !important;
+}
+
+.t-select__caret {
+  font-size: 0.65em;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+/* ── Disabled state ── */
+.t-select--disabled .t-select__trigger {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ── Dropdown — portalled to body so it's never clipped ── */
+.t-select__dropdown {
+  position: fixed;
+  z-index: 999998;
+  background: #060606;
+  border: 1px solid #303030;
+  border-top: 1px solid #1a1a1a;
+  overflow: hidden;
+  animation: t-drop-in 0.12s ease-out;
+}
+
+@keyframes t-drop-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Options ── */
+.t-select__option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #111;
+  color: #555;
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  text-align: left;
+  transition: background 0.1s, color 0.1s;
+}
+
+.t-select__option:last-child {
+  border-bottom: none;
+}
+
+.t-select__option:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #aaa;
+}
+
+.t-select__option--active {
+  color: #999;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.t-select__tick {
+  font-size: 0.6em;
+  opacity: 0.6;
+}

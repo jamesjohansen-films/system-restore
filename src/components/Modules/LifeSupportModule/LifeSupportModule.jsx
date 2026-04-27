@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './LifeSupportModule.css'
+import TerminalSelect from '../../TerminalSelect/TerminalSelect'
 
 // ── Crew vitals ───────────────────────────────────────────────────────────────
 // Each crew member's O2 level over time (minutes since incident start).
@@ -169,18 +170,19 @@ export default function LifeSupportModule({ onSolve, onBack }) {
                   <span>T+60</span>
                 </div>
                 {/* Rank selector */}
-                <select
-                  className="ls-rank-select terminal-text"
+                <TerminalSelect
                   value={rankings[c.id]}
-                  onChange={e => setRank(c.id, e.target.value)}
-                  style={rankings[c.id] ? { borderColor: c.color, color: c.color } : {}}
-                >
-                  <option value="">— RANK —</option>
-                  <option value="1">1ST — FIRST</option>
-                  <option value="2">2ND</option>
-                  <option value="3">3RD</option>
-                  <option value="4">4TH — LAST</option>
-                </select>
+                  onChange={val => setRank(c.id, val)}
+                  placeholder="— RANK —"
+                  disabled={rankSolved}
+                  accentColor={c.color}
+                  options={[
+                    { value: '1', label: '1ST — FIRST' },
+                    { value: '2', label: '2ND' },
+                    { value: '3', label: '3RD' },
+                    { value: '4', label: '4TH — LAST' },
+                  ]}
+                />
               </div>
             ))}
           </div>

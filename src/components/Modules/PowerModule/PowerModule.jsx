@@ -489,12 +489,11 @@ export default function PowerModule({ onSolve, onBack }) {
               <span className="terminal-text">EVENT:&nbsp;</span>
               <span className="terminal-text pm-fragment__value">POWER LOSS — ORIGIN UNKNOWN — ALL SECTORS</span>
             </div>
-            <div className="pm-fragment__data pm-fragment__sig">
-              <span className="terminal-text">POWER SIGNATURE:&nbsp;</span>
-              <span className="terminal-text pm-fragment__value pm-fragment__sig-value">{totalSig}</span>
+            <div className="pm-fragment__data">
+              <span className="terminal-text">STATUS:&nbsp;</span>
+              <span className="terminal-text pm-fragment__value">ONLINE</span>
             </div>
-            <p className="terminal-text pm-fragment__sig-note">↑ POWER SIGNATURE LOGGED — SYSTEM RECORD UPDATED</p>
-            <button className="pm-confirm terminal-text" onClick={() => onSolve(totalSig)}>
+            <button className="pm-confirm terminal-text" onClick={() => onSolve('ONLINE')}>
               INTEGRATE FRAGMENT → CONTINUE
             </button>
           </div>
