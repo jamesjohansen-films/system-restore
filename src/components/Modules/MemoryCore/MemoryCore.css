@@ -1,0 +1,434 @@
+/* ============================================
+   MEMORY CORE — Fragment Reconstruction
+   ============================================ */
+
+.mc-module {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  gap: 6px;
+}
+
+/* ── Header ── */
+.mc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1a1a1a;
+  padding-bottom: 5px;
+  flex-shrink: 0;
+}
+
+.mc-status {
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  color: #c1121f;
+  min-width: 140px;
+  text-align: right;
+  transition: color 0.3s;
+  animation: glitch-flicker 4.1s linear infinite;
+}
+
+.mc-status--unlocked {
+  color: #00dfd8;
+  animation: none;
+  text-shadow: 0 0 12px rgba(0, 223, 216, 0.4);
+}
+
+/* ── Auth gate ── */
+.mc-auth-gate {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+}
+
+.mc-auth-gate__label {
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  color: #c1121f !important;
+  animation: glitch-flicker 2.9s linear infinite;
+}
+
+.mc-auth-gate__sub {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-align: center;
+  max-width: 320px;
+  margin-bottom: 8px;
+}
+
+.mc-auth-gate__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mc-auth-input {
+  background: none;
+  border: none;
+  border-bottom: 1px solid #2a2a2a;
+  color: var(--color-text-primary);
+  font-family: var(--font-terminal);
+  font-size: 1.2rem;
+  letter-spacing: 0.25em;
+  width: 200px;
+  text-align: center;
+  outline: none;
+  padding: 2px 4px;
+}
+
+.mc-auth-input--error {
+  border-bottom-color: #c1121f;
+  color: #c1121f;
+  animation: nav-shake 0.4s ease;
+}
+
+.mc-auth-gate__error {
+  font-size: 0.72rem;
+  color: #c1121f !important;
+  letter-spacing: 0.1em;
+  animation: glitch-flicker 2.1s linear infinite;
+}
+
+.mc-auth-submit {
+  background: none;
+  border: 1px solid #1e1e1e;
+  color: #383838;
+  font-family: var(--font-terminal);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  padding: 4px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 4px;
+}
+
+.mc-auth-submit:hover { border-color: #444; color: #666; }
+
+/* ── Body ── */
+.mc-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.mc-body::-webkit-scrollbar { width: 3px; }
+.mc-body::-webkit-scrollbar-track { background: transparent; }
+.mc-body::-webkit-scrollbar-thumb { background: #1a1a2a; }
+
+/* ── Section labels ── */
+.mc-section-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  color: #2a2a4a;
+  flex-shrink: 0;
+}
+
+.mc-section-sub {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+  margin-top: -4px;
+}
+
+/* ── Fragment cards (sort phase) ── */
+.mc-fragments {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.mc-fragment-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 8px;
+  border: 1px solid #111820;
+  background: rgba(5, 8, 20, 0.25);
+}
+
+.mc-frag-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.mc-frag-id {
+  font-family: 'VT323', monospace;
+  font-size: 0.72rem;
+  color: #2a3a5a;
+  letter-spacing: 0.12em;
+}
+
+.mc-frag-crew {
+  font-family: 'VT323', monospace;
+  font-size: 0.72rem;
+  color: #4a5e7a;
+  letter-spacing: 0.08em;
+}
+
+.mc-frag-timestamp {
+  font-size: 0.60rem;
+  letter-spacing: 0.06em;
+}
+
+.mc-frag-event {
+  font-family: 'VT323', monospace;
+  font-size: 0.78rem;
+  color: #3a4e6a;
+  letter-spacing: 0.04em;
+}
+
+.mc-frag-comp {
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+}
+
+.mc-pos-select {
+  background: #050810;
+  border: 1px solid #1a2030;
+  color: #3a4e6a;
+  font-family: 'VT323', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  padding: 2px 4px;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6'%3E%3Cpath d='M0 0l4 6 4-6z' fill='%233a4e6a'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  padding-right: 16px;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.mc-pos-select option { background: #050810; color: #6a80aa; }
+
+/* ── Error + submit ── */
+.mc-error {
+  font-size: 0.72rem;
+  color: #c1121f !important;
+  letter-spacing: 0.1em;
+  animation: glitch-flicker 2s linear infinite;
+  flex-shrink: 0;
+}
+
+.mc-btn {
+  flex-shrink: 0;
+  padding: 7px;
+  background: none;
+  border: 1px solid #1a2030;
+  color: #2a3a5a;
+  font-family: 'VT323', monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  cursor: not-allowed;
+  transition: all 0.2s;
+}
+
+.mc-btn--ready {
+  border-color: #2a4a88;
+  color: #4a6a9a;
+  cursor: pointer;
+}
+
+.mc-btn--ready:hover {
+  border-color: #3a5a9a;
+  color: #6a8acc;
+  background: rgba(40, 60, 130, 0.08);
+}
+
+.mc-btn--error {
+  border-color: #c1121f;
+  color: #c1121f;
+  animation: nav-shake 0.4s ease;
+}
+
+/* ── Sorted fragments (code extraction phase) ── */
+.mc-sorted-frags {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.mc-sorted-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border: 1px solid #111820;
+  background: rgba(5, 8, 20, 0.2);
+}
+
+.mc-sorted-num {
+  font-family: 'VT323', monospace;
+  font-size: 0.90rem;
+  color: #2a3a5a;
+  min-width: 14px;
+  text-align: center;
+}
+
+.mc-sorted-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.mc-sorted-ts {
+  font-size: 0.58rem;
+  letter-spacing: 0.05em;
+}
+
+.mc-sorted-crew {
+  font-family: 'VT323', monospace;
+  font-size: 0.72rem;
+  color: #4a5e7a;
+  letter-spacing: 0.1em;
+}
+
+.mc-sorted-clue {
+  font-family: 'VT323', monospace;
+  font-size: 0.78rem;
+  color: #3a4e6a;
+  letter-spacing: 0.06em;
+}
+
+/* The first letter of the keyword, highlighted */
+.mc-clue-highlight {
+  color: #00ff88 !important;
+  text-shadow: 0 0 6px rgba(0, 255, 136, 0.5);
+  font-size: 0.90rem;
+}
+
+.mc-sorted-letter {
+  font-family: 'VT323', monospace;
+  font-size: 1.4rem;
+  color: #00ff88;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+  min-width: 20px;
+  text-align: center;
+}
+
+/* ── Code display + entry ── */
+.mc-decode-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.mc-code-display {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 6px 0;
+  border: 1px solid #003322;
+  background: rgba(0, 20, 12, 0.15);
+}
+
+.mc-code-char {
+  font-family: 'VT323', monospace;
+  font-size: 2.2rem;
+  color: #00ff88;
+  text-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.mc-code-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mc-entry-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mc-code-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #1a2030;
+  outline: none;
+  color: #7a9acc;
+  font-family: var(--font-terminal);
+  font-size: 1.1rem;
+  letter-spacing: 0.3em;
+  padding: 2px 0;
+  caret-color: #4a6a9a;
+  min-width: 0;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.mc-code-input::placeholder { color: #1e2a3a; font-size: 0.78rem; letter-spacing: 0.2em; }
+.mc-code-input:focus { border-bottom-color: #2a4a7a; }
+.mc-code-input--error { border-bottom-color: #c1121f; color: #c1121f; }
+
+/* ── Solved ── */
+.mc-solved__headline {
+  font-size: 0.88rem;
+  color: #00dfd8;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 14px rgba(0, 223, 216, 0.5);
+  flex-shrink: 0;
+}
+
+.mc-final-fragment {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border-left: 2px solid #1a2030;
+  padding-left: 9px;
+  animation: nav-fade-in 0.5s ease-out;
+}
+
+.mc-fragment__label {
+  font-size: 0.76rem;
+  color: #3a4a6a;
+  letter-spacing: 0.12em;
+}
+
+.mc-frag-row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.mc-frag-row .terminal-text { font-size: 0.72rem; }
+.mc-frag-value { color: #5a7aaa !important; }
+
+.mc-confirm {
+  margin-top: 6px;
+  background: none;
+  border: 1px solid #2a4a88;
+  color: #00dfd8;
+  font-family: var(--font-terminal);
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  padding: 5px 14px;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.mc-confirm:hover {
+  background: rgba(0, 223, 216, 0.08);
+  border-color: rgba(0, 223, 216, 0.5);
+}

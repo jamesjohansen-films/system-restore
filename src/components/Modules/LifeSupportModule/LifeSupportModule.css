@@ -1,0 +1,368 @@
+/* ============================================
+   LIFE SUPPORT MODULE — Vitals + Log Analysis
+   ============================================ */
+
+.ls-module {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  gap: 6px;
+}
+
+/* ── Header ── */
+.ls-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1a1a1a;
+  padding-bottom: 5px;
+  flex-shrink: 0;
+}
+
+.ls-status {
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  color: #c1121f;
+  min-width: 160px;
+  text-align: right;
+  transition: color 0.3s;
+  animation: glitch-flicker 3.5s linear infinite;
+}
+
+.ls-status--restored {
+  color: #00dfd8;
+  animation: none;
+}
+
+/* ── Auth gate ── */
+.ls-auth-gate {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+}
+
+.ls-auth-gate__label {
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  color: #c1121f !important;
+  animation: glitch-flicker 3.2s linear infinite;
+}
+
+.ls-auth-gate__sub {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-align: center;
+  max-width: 320px;
+  margin-bottom: 8px;
+}
+
+.ls-auth-gate__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ls-auth-input {
+  background: none;
+  border: none;
+  border-bottom: 1px solid #2a2a2a;
+  color: var(--color-text-primary);
+  font-family: var(--font-terminal);
+  font-size: 1.2rem;
+  letter-spacing: 0.25em;
+  width: 160px;
+  text-align: center;
+  outline: none;
+  padding: 2px 4px;
+}
+
+.ls-auth-input--error {
+  border-bottom-color: #c1121f;
+  color: #c1121f;
+  animation: nav-shake 0.4s ease;
+}
+
+.ls-auth-gate__error {
+  font-size: 0.72rem;
+  color: #c1121f !important;
+  letter-spacing: 0.1em;
+  animation: glitch-flicker 2s linear infinite;
+}
+
+.ls-auth-submit {
+  background: none;
+  border: 1px solid #1e1e1e;
+  color: #383838;
+  font-family: var(--font-terminal);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  padding: 4px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 4px;
+}
+
+.ls-auth-submit:hover { border-color: #444; color: #666; }
+
+/* ── Body (shared by vitals + compartment phases) ── */
+.ls-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.ls-body::-webkit-scrollbar { width: 3px; }
+.ls-body::-webkit-scrollbar-track { background: transparent; }
+.ls-body::-webkit-scrollbar-thumb { background: #1a1a1a; }
+
+/* ── Section labels ── */
+.ls-section-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  color: #2a3a2a;
+  flex-shrink: 0;
+}
+
+.ls-section-sub {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+  margin-top: -4px;
+}
+
+/* ── Vitals 2×2 grid ── */
+.ls-vitals-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ls-vital-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 7px;
+  border: 1px solid #0f1a0f;
+  background: rgba(0, 5, 0, 0.2);
+}
+
+.ls-vital-name {
+  font-family: 'VT323', monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+}
+
+.ls-vital-svg {
+  width: 100%;
+  height: 36px;
+  display: block;
+  background: rgba(0, 5, 0, 0.15);
+  border: 1px solid #0c140c;
+}
+
+.ls-vital-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.55rem;
+  letter-spacing: 0.04em;
+  opacity: 0.35;
+}
+
+.ls-rank-select {
+  background: #050a05;
+  border: 1px solid #1a2a1a;
+  color: #4a6a4a;
+  font-family: 'VT323', monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  padding: 2px 4px;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, color 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6'%3E%3Cpath d='M0 0l4 6 4-6z' fill='%234a6a4a'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  padding-right: 16px;
+}
+
+.ls-rank-select option { background: #050a05; color: #8aaa8a; }
+
+/* ── Error + submit ── */
+.ls-error {
+  font-size: 0.72rem;
+  color: #c1121f !important;
+  letter-spacing: 0.1em;
+  animation: glitch-flicker 2s linear infinite;
+  flex-shrink: 0;
+}
+
+.ls-submit {
+  flex-shrink: 0;
+  padding: 7px;
+  background: none;
+  border: 1px solid #1a2a1a;
+  color: #2a3a2a;
+  font-family: 'VT323', monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  cursor: not-allowed;
+  transition: all 0.2s;
+}
+
+.ls-submit--ready {
+  border-color: #2a5a2a;
+  color: #4a8a4a;
+  cursor: pointer;
+}
+
+.ls-submit--ready:hover {
+  border-color: #3a7a3a;
+  color: #6aaa6a;
+  background: rgba(30, 80, 30, 0.08);
+}
+
+.ls-submit--error {
+  border-color: #c1121f;
+  color: #c1121f;
+  animation: nav-shake 0.4s ease;
+}
+
+/* ── Access log table ── */
+.ls-log-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  border: 1px solid #0f1a0f;
+  background: rgba(0, 5, 0, 0.15);
+}
+
+.ls-log-wrap::-webkit-scrollbar { width: 3px; }
+.ls-log-wrap::-webkit-scrollbar-track { background: transparent; }
+.ls-log-wrap::-webkit-scrollbar-thumb { background: #1a2a1a; }
+
+.ls-log-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ls-log-table th {
+  font-family: 'VT323', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: #2a3a2a;
+  padding: 3px 8px 4px;
+  text-align: left;
+  border-bottom: 1px solid #0f1a0f;
+  position: sticky;
+  top: 0;
+  background: #060d06;
+}
+
+.ls-log-table td {
+  font-family: 'VT323', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  color: #3a4a3a;
+  border-bottom: 1px solid #0a120a;
+}
+
+.ls-log-table tr:last-child td { border-bottom: none; }
+
+/* ── Compartment entry ── */
+.ls-comp-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.ls-comp-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ls-comp-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #1a2a1a;
+  outline: none;
+  color: #6a8a6a;
+  font-family: var(--font-terminal);
+  font-size: 1.0rem;
+  letter-spacing: 0.2em;
+  padding: 2px 0;
+  caret-color: #4a6a4a;
+  width: 120px;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.ls-comp-input::placeholder { color: #1e2a1e; font-size: 0.78rem; letter-spacing: 0.12em; }
+.ls-comp-input:focus { border-bottom-color: #2a4a2a; }
+.ls-comp-input--error { border-bottom-color: #c1121f; color: #c1121f; }
+
+/* ── Solved ── */
+.ls-solved__headline {
+  font-size: 0.88rem;
+  color: #00dfd8;
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 10px rgba(0,223,216,0.35);
+  flex-shrink: 0;
+}
+
+.ls-fragment {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-left: 2px solid #1a2a1a;
+  padding-left: 9px;
+  animation: nav-fade-in 0.5s ease-out;
+}
+
+.ls-fragment__label {
+  font-size: 0.76rem;
+  color: #3a4a3a;
+  letter-spacing: 0.12em;
+}
+
+.ls-fragment__row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.ls-fragment__row .terminal-text { font-size: 0.72rem; }
+.ls-fragment__value { color: #5a7a5a !important; }
+
+.ls-confirm {
+  margin-top: 4px;
+  background: none;
+  border: 1px solid #1e2a1e;
+  color: #00dfd8;
+  font-family: var(--font-terminal);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  padding: 3px 10px;
+  cursor: pointer;
+  border-radius: 2px;
+  align-self: flex-start;
+  transition: background 0.2s, border-color 0.2s;
+}
+.ls-confirm:hover {
+  background: rgba(0,223,216,0.07);
+  border-color: rgba(0,223,216,0.4);
+}

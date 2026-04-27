@@ -1,0 +1,175 @@
+/* ============================================
+   CONTROL ROOM — Game window layout
+   ============================================ */
+
+.control-room {
+  /* Fixed 16:9 game window */
+  width: min(100vw, 177.78vh);
+  height: min(100vh, 56.25vw);
+  max-width: 1600px;
+  max-height: 900px;
+
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px 12px;
+  gap: 10px;
+  position: relative;
+  animation: flicker 10s infinite;
+
+  /* Room environment */
+  background:
+    linear-gradient(to bottom,
+      rgba(60,60,60,0.55) 0%,
+      rgba(20,20,20,0.2) 4%,
+      transparent 14%
+    ),
+    linear-gradient(to top,
+      rgba(0,0,0,0.98) 0%,
+      transparent 22%
+    ),
+    linear-gradient(to right,
+      rgba(0,0,0,0.75) 0%,
+      transparent 18%,
+      transparent 82%,
+      rgba(0,0,0,0.75) 100%
+    ),
+    radial-gradient(ellipse at 50% 18%,
+      #252525 0%,
+      #141414 30%,
+      #060606 100%
+    );
+}
+
+/* Desk surface horizon line */
+.control-room::before {
+  content: '';
+  position: absolute;
+  bottom: 44px;
+  left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255,255,255,0.05) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.05) 75%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Top corner brackets — game HUD feel */
+.control-room::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    var(--color-border-bright) 0%,
+    var(--color-border) 20%,
+    transparent 50%,
+    var(--color-border) 80%,
+    var(--color-border-bright) 100%
+  );
+  opacity: 0.6;
+  transition: var(--transition-stage);
+}
+
+/* Header */
+.control-room__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 8px;
+  height: 28px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  transition: border-color var(--transition-stage);
+  position: relative;
+  z-index: 2;
+}
+
+.control-room__header .terminal-text {
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+}
+
+/* ── 3D CONSOLE GRID ──────────────────────────
+   Perspective tilt makes it look like you're
+   sitting in front of a real physical console
+   ─────────────────────────────────────────── */
+.control-room__grid {
+  display: grid;
+  grid-template-columns: 1fr 2.4fr 1fr;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  z-index: 2;
+
+  /* Tilt the whole console surface away from the viewer */
+  perspective: 1400px;
+  transform: perspective(1400px) rotateX(4deg);
+  transform-origin: center bottom;
+  transform-style: preserve-3d;
+}
+
+/* Side columns */
+.control-room__side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  transform-style: preserve-3d;
+}
+
+.control-room__side .panel {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Left wing — angled inward toward the CRT */
+.control-room__side--left {
+  transform: perspective(500px) rotateY(14deg);
+  transform-origin: right center;
+}
+
+/* Right wing — angled inward toward the CRT */
+.control-room__side--right {
+  transform: perspective(500px) rotateY(-14deg);
+  transform-origin: left center;
+}
+
+/* Footer */
+.control-room__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 8px;
+  height: 24px;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+  transition: border-color var(--transition-stage);
+  position: relative;
+  z-index: 2;
+}
+
+.control-room__footer .terminal-text {
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+}
+
+/* Ambient color glow — shifts with stage */
+.control-room__ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    ellipse at 50% 42%,
+    var(--color-glow) 0%,
+    transparent 60%
+  );
+  transition: var(--transition-stage);
+}

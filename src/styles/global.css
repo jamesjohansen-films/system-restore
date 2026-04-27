@@ -1,0 +1,380 @@
+/* ============================================
+   SYSTEM.RESTORE — Global Styles
+   ============================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  cursor: none !important;
+}
+
+/* ── Custom cursor — Riddle School style white dot ── */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 36% 30%,
+    #ffffff 0%,
+    #e2e2e2 30%,
+    #b4b4b4 60%,
+    #787878 85%,
+    #505050 100%
+  );
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.9),
+    0 2px 4px rgba(0, 0, 0, 0.7),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  /* JS drives position via transform — GPU composited, no layout cost */
+  will-change: transform;
+  z-index: 1000000;
+}
+
+/* Ring that follows cursor over interactive elements */
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  margin-top: -9px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1000001;
+  /* Fade out slowly when leaving an interactive element */
+  transition: opacity 0.35s ease;
+}
+
+.cursor-ring--active {
+  opacity: 1;
+  /* Snap in quickly when entering */
+  transition: opacity 0.08s ease;
+}
+
+:root {
+  --color-bg: #111111;
+  --color-room: #0a0a0a;
+  --color-surface: #0a0a0a;
+  --color-panel: #1a1a1a;
+  --color-panel-top: #282828;
+  --color-border: #363636;
+  --color-border-bright: #545454;
+  --color-text-primary: #b0b0b0;
+  --color-text-dim: #282828;
+  --color-accent: #3a3a3a;
+  --color-glow: rgba(58, 58, 58, 0.0);
+
+  --font-terminal: 'VT323', monospace;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-ui: 'JetBrains Mono', monospace;
+
+  --transition-stage: all 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* Deep space room background */
+  background-color: #050505;
+  background-image:
+    /* Ceiling light strip */
+    linear-gradient(to bottom, rgba(40,40,40,0.6) 0%, transparent 8%),
+    /* Floor gradient */
+    linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 15%),
+    /* Subtle room grid - vertical lines */
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 79px,
+      rgba(255,255,255,0.015) 79px,
+      rgba(255,255,255,0.015) 80px
+    ),
+    /* Subtle room grid - horizontal lines */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 79px,
+      rgba(255,255,255,0.015) 79px,
+      rgba(255,255,255,0.015) 80px
+    );
+  color: var(--color-text-primary);
+  font-family: var(--font-terminal);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  user-select: none;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================
+   CRT SCREEN OVERLAY
+   ============================================ */
+
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.crt-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.10) 3px,
+    rgba(0, 0, 0, 0.10) 4px
+  );
+}
+
+.crt-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.80) 100%
+  );
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes flicker {
+  0%   { opacity: 1; }
+  91%  { opacity: 1; }
+  92%  { opacity: 0.9; }
+  93%  { opacity: 1; }
+  97%  { opacity: 0.95; }
+  100% { opacity: 1; }
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes error-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.75; }
+}
+
+/* Glitch flicker — applied to all ERROR text labels */
+@keyframes glitch-flicker {
+  /* most of the time: steady */
+  0%    { opacity: 1;    transform: translate(0,0);     text-shadow: 0 0 10px rgba(193,18,31,0.55); }
+  /* burst 1 ~8% */
+  7.8%  { opacity: 1;    transform: translate(0,0);     text-shadow: 0 0 10px rgba(193,18,31,0.55); }
+  8.0%  { opacity: 0.3;  transform: translate(-3px,0);  text-shadow:  3px 0 #ff2020, -3px 0 #002aff; }
+  8.3%  { opacity: 1;    transform: translate( 2px,0);  text-shadow: -2px 0 #ff2020,  2px 0 #002aff; }
+  8.5%  { opacity: 1;    transform: translate(0,0);     text-shadow: 0 0 10px rgba(193,18,31,0.55); }
+  /* burst 2 ~44% */
+  43.6% { opacity: 1;    transform: translate(0,0);     text-shadow: 0 0 10px rgba(193,18,31,0.55); }
+  43.8% { opacity: 0;    transform: translate( 4px,0);  }
+  44.1% { opacity: 0.85; transform: translate(-2px,0);  text-shadow:  2px 0 #ff2020, -2px 0 #00eeff; }
+  44.4% { opacity: 1;    transform: translate(0,0);     text-shadow: 0 0 10px rgba(193,18,31,0.55); }
+  /* burst 3 ~78% */
+  77.5% { opacity: 1;    transform: translate(0,0);     text-shadow: 0 0 10px rgba(193,18,31,0.55); }
+  77.7% { opacity: 0.5;  transform: translate( 2px,1px); text-shadow: -3px 0 #ff2020,  3px 0 #00eeff; }
+  78.0% { opacity: 0;    transform: translate(-3px,0);  }
+  78.2% { opacity: 1;    transform: translate(0,0);     text-shadow: 0 0 10px rgba(193,18,31,0.55); }
+  100%  { opacity: 1;    transform: translate(0,0);     text-shadow: 0 0 10px rgba(193,18,31,0.55); }
+}
+
+/* Shared shake — used by error states across modules */
+@keyframes nav-shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-5px); }
+  40%       { transform: translateX(5px); }
+  60%       { transform: translateX(-3px); }
+  80%       { transform: translateX(3px); }
+}
+
+/* Shared fade-in — used by solved/fragment panels across modules */
+@keyframes nav-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Dev skip button — remove before launch ── */
+.dev-skip-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 999;
+  background: rgba(255, 80, 0, 0.1);
+  border: 1px dashed rgba(255, 80, 0, 0.4);
+  color: rgba(255, 80, 0, 0.6);
+  font-family: 'VT323', monospace;
+  font-size: 0.70rem;
+  letter-spacing: 0.1em;
+  padding: 3px 9px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.15s, background 0.15s;
+  border-radius: 2px;
+}
+.dev-skip-btn:hover {
+  opacity: 1;
+  background: rgba(255, 80, 0, 0.2);
+}
+
+@keyframes panel-online {
+  0%   { filter: brightness(0); }
+  20%  { filter: brightness(2); }
+  40%  { filter: brightness(0.8); }
+  60%  { filter: brightness(1.4); }
+  100% { filter: brightness(1); }
+}
+
+@keyframes ambient-glow {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+/* ============================================
+   PANEL BASE — physical hardware feel
+   ============================================ */
+
+.panel {
+  background:
+    linear-gradient(145deg,
+      rgba(255,255,255,0.09) 0%,
+      rgba(255,255,255,0.03) 20%,
+      transparent 50%
+    ),
+    linear-gradient(160deg,
+      var(--color-panel-top) 0%,
+      var(--color-panel) 50%,
+      #0c0c0c 100%
+    );
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-border-bright);
+  border-left-color: var(--color-border-bright);
+  border-bottom-color: #080808;
+  border-right-color: #080808;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    /* Physical thickness — stacked layers simulate a thick housing */
+    3px 3px 0 #0e0e0e,
+    5px 5px 0 #0a0a0a,
+    7px 7px 0 #070707,
+    9px 9px 0 #050505,
+    /* Far drop shadow */
+    12px 18px 40px rgba(0,0,0,0.85),
+    20px 28px 60px rgba(0,0,0,0.6),
+    /* Top edge highlight */
+    0 -1px 0 rgba(255,255,255,0.04),
+    /* Inner top shine */
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    /* Inner depth */
+    inset 0 -2px 6px rgba(0,0,0,0.95),
+    inset 2px 2px 10px rgba(0,0,0,0.6);
+  transition: var(--transition-stage);
+}
+
+/* Screw detail — top left */
+.panel::before {
+  content: '⬡';
+  position: absolute;
+  top: 5px; left: 6px;
+  font-size: 7px;
+  color: var(--color-border);
+  opacity: 0.5;
+  z-index: 2;
+}
+
+/* Screw detail — bottom right */
+.panel::after {
+  content: '⬡';
+  position: absolute;
+  bottom: 5px; right: 6px;
+  font-size: 7px;
+  color: var(--color-border);
+  opacity: 0.5;
+  z-index: 2;
+}
+
+/* ============================================
+   TERMINAL TEXT
+   ============================================ */
+
+.terminal-text {
+  font-family: var(--font-terminal);
+  font-size: 1.4rem;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+}
+
+.terminal-text--dim {
+  color: var(--color-text-dim);
+}
+
+.terminal-cursor::after {
+  content: '█';
+  animation: cursor-blink 1s step-end infinite;
+  color: var(--color-text-primary);
+}
+
+/* ============================================
+   STAGE TRANSITIONS
+   ============================================ */
+
+.stage-2 {
+  --color-accent: #c1121f;
+  --color-border: #550000;
+  --color-border-bright: #8a0000;
+  --color-text-primary: #cccccc;
+  --color-glow: rgba(193, 18, 31, 0.15);
+}
+
+.stage-3 {
+  --color-bg: #081422;
+  --color-room: #040e1a;
+  --color-surface: #050d18;
+  --color-panel: #0b1c2d;
+  --color-panel-top: #0f2238;
+  --color-border: #1a4060;
+  --color-border-bright: #2a80cc;
+  --color-text-primary: #7ed6ff;
+  --color-accent: #3daeff;
+  --color-glow: rgba(61, 174, 255, 0.18);
+  --font-terminal: 'JetBrains Mono', monospace;
+}
+
+.stage-4 {
+  --color-bg: #070c1c;
+  --color-room: #040810;
+  --color-surface: #050a14;
+  --color-panel: #090f20;
+  --color-panel-top: #0d1428;
+  --color-border: #004488;
+  --color-border-bright: #0066cc;
+  --color-text-primary: #d0f4ff;
+  --color-accent: #00dfd8;
+  --color-glow: rgba(0, 223, 216, 0.22);
+  --font-terminal: 'Orbitron', sans-serif;
+}

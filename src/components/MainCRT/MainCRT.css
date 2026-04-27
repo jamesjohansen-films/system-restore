@@ -1,0 +1,350 @@
+/* ============================================
+   MAIN CRT — Physical monitor appearance
+   ============================================ */
+
+
+.main-crt {
+  /* Outer bezel — dark plastic housing */
+  background: linear-gradient(145deg, #1c1c1c 0%, #111 40%, #0a0a0a 100%);
+  border: 3px solid #222;
+  border-top-color: #333;
+  border-left-color: #2e2e2e;
+  border-bottom-color: #080808;
+  border-right-color: #080808;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 14px;
+
+  box-shadow:
+    /* Outer drop shadow — lifts it off the desk */
+    0 12px 32px rgba(0,0,0,0.8),
+    0 32px 80px rgba(0,0,0,0.6),
+    0 64px 120px rgba(0,0,0,0.4),
+    /* Bezel top highlight */
+    0 1px 0 rgba(255,255,255,0.06),
+    /* Inner bezel shadow */
+    inset 0 2px 8px rgba(0,0,0,0.9),
+    inset 0 -2px 6px rgba(0,0,0,0.7),
+    /* Ambient screen glow */
+    0 0 60px var(--color-glow);
+
+  transition: box-shadow 1.4s ease-in-out, border-color 1.4s ease-in-out;
+  transform-style: preserve-3d;
+}
+
+/* Actual glass screen — inset within bezel */
+.main-crt__screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 32px;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+
+  /* Screen background — faint residual phosphor glow even in low power */
+  background: radial-gradient(ellipse at 50% 45%, #0e0e0e 0%, #040404 70%);
+
+  /* Screen recess depth */
+  box-shadow:
+    inset 0 0 40px rgba(0,0,0,0.9),
+    inset 0 0 80px rgba(0,0,0,0.5),
+    inset 2px 2px 12px rgba(0,0,0,0.8),
+    inset -2px -2px 12px rgba(0,0,0,0.6);
+
+  /* Subtle screen border */
+  border: 1px solid #0a0a0a;
+}
+
+/* Glass reflection overlay */
+.main-crt__screen::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 35%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.025) 0%,
+    rgba(255,255,255,0.008) 50%,
+    transparent 100%
+  );
+  border-radius: 8px 8px 0 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Screen edge vignette — simulates CRT curvature */
+.main-crt__screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 60%,
+    rgba(0,0,0,0.55) 100%
+  );
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 9;
+}
+
+/* Screen label */
+.main-crt__label {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  opacity: 0.35;
+  z-index: 20;
+  white-space: nowrap;
+}
+
+/* Bezel indicator lights */
+.main-crt__indicators {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 20;
+}
+
+.main-crt__led {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #1a1a1a;
+}
+
+.main-crt__led--active {
+  background: var(--color-accent);
+  box-shadow: 0 0 4px var(--color-accent), 0 0 8px var(--color-accent);
+  animation: ambient-glow 3s ease-in-out infinite;
+}
+
+/* Boot prompt content */
+.main-crt__boot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  position: relative;
+  z-index: 5;
+  width: 100%;
+}
+
+.main-crt__boot .terminal-text {
+  font-size: 1.2rem;
+  color: #484848;
+}
+
+.main-crt__boot .terminal-text--highlight {
+  color: #767676;
+}
+
+.main-crt__prompt {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  gap: 6px;
+}
+
+.main-crt__input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #2a2a2a;
+  outline: none;
+  color: var(--color-text-primary);
+  font-family: var(--font-terminal);
+  font-size: 1.4rem;
+  width: 56px;
+  text-align: center;
+  caret-color: transparent;
+  letter-spacing: 0.15em;
+  transition: border-color 0.3s;
+}
+
+.main-crt__input:focus {
+  border-bottom-color: var(--color-text-dim);
+}
+
+.main-crt__input::placeholder {
+  color: #2a2a2a;
+}
+
+.main-crt__prompt-arrow {
+  color: #484848;
+}
+
+.main-crt__hint {
+  font-size: 0.85rem;
+  color: #2a2a2a;
+  letter-spacing: 0.12em;
+  margin-left: 10px;
+  align-self: flex-end;
+  padding-bottom: 4px;
+}
+
+.main-crt__error {
+  color: #c1121f;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  animation: glitch-flicker 4s linear infinite;
+}
+
+/* ── Booting typewriter ── */
+.main-crt__booting {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  max-width: 520px;
+  position: relative;
+  z-index: 5;
+  align-items: flex-start;
+}
+
+.mct-boot-line {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  animation: mct-line-in 0.15s ease-out;
+}
+
+@keyframes mct-line-in {
+  from { opacity: 0; transform: translateX(-4px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.mct-boot-line .terminal-text {
+  font-size: 1.1rem;
+}
+
+/* ── Module selection ── */
+.main-crt__modules {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  gap: 10px;
+  position: relative;
+  z-index: 5;
+  animation: mct-line-in 0.3s ease-out;
+}
+
+.mct-modules-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid #1e1e1e;
+  padding-bottom: 8px;
+}
+
+.mct-modules-title {
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  color: #555;
+}
+
+.mct-module-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.mct-module-row {
+  display: grid;
+  grid-template-columns: 52px 1fr 120px auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+/* Accessible + unrestored → clickable */
+.mct-module-row--accessible {
+  cursor: pointer;
+  border-color: #1e1e1e;
+}
+.mct-module-row--accessible:hover {
+  background: rgba(255,255,255,0.03);
+  border-color: #333;
+}
+
+/* Restored */
+.mct-module-row--restored {
+  opacity: 0.6;
+}
+
+/* Locked */
+.mct-module-row--locked {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.mct-module-label {
+  font-size: 0.9rem;
+  color: #383838;
+  letter-spacing: 0.1em;
+}
+
+.mct-module-name {
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  color: #666;
+}
+
+/* Accessible row highlights name */
+.mct-module-row--accessible .mct-module-name {
+  color: #909090;
+}
+
+/* Restored row */
+.mct-module-row--restored .mct-module-name {
+  color: #00dfd8;
+}
+
+.mct-module-status {
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-align: right;
+}
+.mct-module-row--accessible  .mct-module-status { color: #c1121f; animation: glitch-flicker 4s linear infinite; }
+.mct-module-row:nth-child(2).mct-module-row--accessible .mct-module-status { animation-duration: 3.1s; animation-delay: 0.4s; }
+.mct-module-row:nth-child(3).mct-module-row--accessible .mct-module-status { animation-duration: 4.8s; animation-delay: 1.8s; }
+.mct-module-row:nth-child(4).mct-module-row--accessible .mct-module-status { animation-duration: 3.7s; animation-delay: 0.9s; }
+.mct-module-row:nth-child(5).mct-module-row--accessible .mct-module-status { animation-duration: 5.5s; animation-delay: 2.3s; }
+.mct-module-row--restored    .mct-module-status { color: #00dfd8; }
+.mct-module-row--locked      .mct-module-status { color: #2a2a2a; }
+
+.mct-module-action {
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  color: #484848;
+  white-space: nowrap;
+}
+.mct-module-row--accessible:hover .mct-module-action {
+  color: #909090;
+}
+
+.mct-modules-footer {
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  margin-top: auto;
+}
+
+/* ── Shared text helpers ── */
+.mct-highlight { color: #767676; }
+.mct-arrow     { color: #3a3a3a; }
+.mct-error     { color: #c1121f; font-size: 1rem; letter-spacing: 0.08em; animation: glitch-flicker 5.2s linear infinite; animation-delay: 1.4s; }

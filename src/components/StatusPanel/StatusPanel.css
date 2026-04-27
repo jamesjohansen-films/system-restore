@@ -1,0 +1,110 @@
+/* ============================================
+   STATUS PANEL — Physical hardware screens
+   ============================================ */
+
+.status-panel {
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 6px;
+  transition: var(--transition-stage);
+}
+
+/* Inner screen — recessed within panel bezel */
+.status-panel__screen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  background: #030303;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,0.9),
+    inset 2px 2px 6px rgba(0,0,0,0.7);
+}
+
+.status-panel__screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 55%,
+    rgba(0,0,0,0.6) 100%
+  );
+  pointer-events: none;
+}
+
+/* ERROR state */
+.status-panel--error {
+  border-color: #4a0000;
+  border-top-color: #880000;
+  animation: error-pulse 2.5s ease-in-out infinite;
+}
+
+.status-panel--error .status-panel__screen {
+  background: #0e0000;
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,0.9),
+    inset 0 0 40px rgba(120,0,0,0.3);
+}
+
+/* ONLINE state */
+.status-panel--online {
+  border-color: var(--color-border);
+  border-top-color: var(--color-accent);
+  animation: panel-online 0.6s ease-out forwards;
+}
+
+.status-panel--online .status-panel__screen {
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,0.9),
+    inset 0 0 30px rgba(0,0,0,0.4),
+    0 0 20px var(--color-glow);
+}
+
+/* Content */
+.status-panel__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.status-panel__error {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  color: #c1121f;
+  letter-spacing: 0.25em;
+  text-shadow: 0 0 12px rgba(193,18,31,0.6);
+  animation: glitch-flicker 3.3s linear infinite;
+  animation-delay: 0.7s;
+}
+
+.status-panel__blank {
+  font-family: var(--font-terminal);
+  font-size: 1.4rem;
+  color: #1a1a1a;
+}
+
+.status-panel__label {
+  font-size: 0.75rem;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-family: var(--font-mono);
+}
+
+.status-panel__value {
+  font-size: 1.5rem;
+  color: var(--color-text-primary);
+  font-family: var(--font-terminal);
+  text-shadow: 0 0 8px var(--color-glow);
+}
