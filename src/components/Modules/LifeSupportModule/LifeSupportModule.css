@@ -131,47 +131,53 @@
   border-color: #1a2a1a;
 }
 
-/* ── Slot targets ── */
+/* ── Slot targets — full-width stacked rows ── */
 .ls-slots {
   display: flex;
-  gap: 3px;
+  flex-direction: column;
+  gap: 2px;
   flex-shrink: 0;
 }
 
-.ls-slot {
-  flex: 1;
-  height: 50px;
-  border: 1px solid #222;
+.ls-slot--row {
+  width: 100%;
+  height: 26px;
+  border: 1px solid #1a1a1a;
   background: #000;
   display: flex;
   align-items: center;
-  justify-content: center;
   cursor: pointer;
   transition: border-color 0.15s;
   overflow: hidden;
   padding: 0;
-  min-width: 0;
+  gap: 0;
+  box-sizing: border-box;
 }
 
-.ls-slot:hover          { border-color: #444; }
-.ls-slot--target        { border-color: #555; border-style: dashed; }
-.ls-slot--filled        { border-color: #333; }
-.ls-slot--filled:hover  { border-color: #555; }
+.ls-slot--row:hover         { border-color: #333; }
+.ls-slot--target            { border-color: #2a3a2a; border-style: dashed; }
+.ls-slot--filled            { border-color: #222; }
+.ls-slot--filled:hover      { border-color: #444; }
 
 .ls-slot-num {
   font-family: 'VT323', monospace;
-  font-size: 0.75rem;
+  font-size: 0.70rem;
   color: #1a2a1a;
+  min-width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+  padding: 0 2px;
 }
 
 .ls-slot-frag {
-  width: 100%;
+  flex: 1;
   height: 100%;
   cursor: grab;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   position: relative;
+  min-width: 0;
 }
 
 .ls-slot-frag:hover { opacity: 0.75; }

@@ -5,9 +5,9 @@ import './LifeSupportModule.css'
 const NUM_COLS = 6
 const MAX_VAL  = 5
 
-// Channel x-positions: main strip (200-unit vbox) and fragment tile (60-unit vbox)
-const CHAN_X  = [22, 54, 86, 118, 150, 182]
-const CHAN_XF = [5,  15,  25,  35,  45,  55]
+// Channel x-positions in the shared 200-unit viewBox
+// Used by BOTH SpecStrip and FragStrip so bars align at the same horizontal positions
+const CHAN_X = [22, 54, 86, 118, 150, 182]
 
 // ── Puzzle data ────────────────────────────────────────────────────────────────
 // Math verified: summing correct bars equals target exactly.
@@ -103,9 +103,9 @@ function SpecStrip({ target, result }) {
         const wrong   = result[i] !== 0 && result[i] !== target[i]
         const pending = target[i] > 0   && result[i] === 0
 
-        if (matched) return <rect key={i} x={x-5} y={0} width={10} height={vh} fill="white"/>
-        if (wrong)   return <rect key={i} x={x-5} y={0} width={10} height={vh} fill="#c1121f"/>
-        if (pending) return <rect key={i} x={x-5} y={0} width={10} height={vh} fill="rgba(255,255,255,0.1)"/>
+        if (matched) return <rect key={i} x={x-4} y={0} width={8} height={vh} fill="white"/>
+        if (wrong)   return <rect key={i} x={x-4} y={0} width={8} height={vh} fill="#c1121f"/>
+        if (pending) return <rect key={i} x={x-4} y={0} width={8} height={vh} fill="rgba(255,255,255,0.12)"/>
         return null
       })}
     </svg>
@@ -113,17 +113,19 @@ function SpecStrip({ target, result }) {
 }
 
 // ── Fragment mini strip ────────────────────────────────────────────────────────
-// Additive  : flat white bar.
-// Subtractive: hollow red outline + diagonal slash. No fill. No glow.
+// Uses the SAME 200-unit viewBox and CHAN_X positions as SpecStrip so bars
+// align directly when both containers share the same rendered width.
+// Additive    : narrow white bar
+// Subtractive : hollow red outline + diagonal slash
 function FragStrip({ bars }) {
-  const vw = 60, vh = 38
+  const vw = 200, vh = 38
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
       {bars.map((v, i) => {
         if (v === 0) return null
-        const x = CHAN_XF[i]
+        const x = CHAN_X[i]
         if (v < 0) {
-          const rx = x - 3, ry = 1, rw = 7, rh = vh - 2
+          const rx = x - 4, ry = 2, rw = 8, rh = vh - 4
           return (
             <g key={i}>
               <rect x={rx} y={ry} width={rw} height={rh}
@@ -133,7 +135,7 @@ function FragStrip({ bars }) {
             </g>
           )
         }
-        return <rect key={i} x={x - 3} y={0} width={7} height={vh} fill="white"/>
+        return <rect key={i} x={x - 4} y={0} width={8} height={vh} fill="white"/>
       })}
     </svg>
   )
@@ -293,7 +295,7 @@ export default function LifeSupportModule({ onSolve, onBack }) {
             <SpecStrip target={round.target} result={result}/>
           </div>
 
-          {/* Slots */}
+          {/* Slots — full-width rows so bars align with the strip above */}
           <div className="ls-section-label terminal-text">
             ACTIVE SLOTS — {placements.filter(Boolean).length}/{round.slotsCount} PLACED:
           </div>
@@ -302,19 +304,21 @@ export default function LifeSupportModule({ onSolve, onBack }) {
               const f = fragId ? round.fragments.find(x => x.id === fragId) : null
               return (
                 <div key={si}
-                  className={`ls-slot ${f ? 'ls-slot--filled' : ''} ${selected && !f ? 'ls-slot--target' : ''}`}
+                  className={`ls-slot ls-slot--row ${f ? 'ls-slot--filled' : ''} ${selected && !f ? 'ls-slot--target' : ''}`}
                   onClick={() => clickSlot(si)}
                   onDragOver={onDragOver}
                   onDrop={e => onDropSlot(e, si)}
                 >
+                  <span className="ls-slot-num terminal-text terminal-text--dim">{si + 1}</span>
                   {f
                     ? <div className="ls-slot-frag"
                         draggable
                         onDragStart={e => { e.stopPropagation(); onDragStart(e, f.id, si) }}
                         onClick={e => { e.stopPropagation(); clickSlot(si) }}>
                         <FragStrip bars={f.bars}/>
+                        {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
                       </div>
-                    : <span className="ls-slot-num terminal-text terminal-text--dim">{si + 1}</span>
+                    : null
                   }
                 </div>
               )
