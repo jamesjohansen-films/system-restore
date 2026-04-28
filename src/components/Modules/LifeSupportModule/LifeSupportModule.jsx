@@ -1,30 +1,72 @@
 import { useState, useRef } from 'react'
 import './LifeSupportModule.css'
 
-// ══════════════════════════════════════════════════════════════════════════════
-// PHASE 1 — SPECTROGRAPH RECONSTRUCTION
-// Player reconstructs VITAGEN-7's spectral signature from 7 fragments (5 correct + 2 decoys)
-// ══════════════════════════════════════════════════════════════════════════════
+// ── Constants ──────────────────────────────────────────────────────────────────
+const NUM_COLS  = 6
+const MAX_VAL   = 5
+const COL_COLORS = ['#5566dd','#0099cc','#00aa66','#99aa00','#cc7700','#cc2200']
 
-const SLOTS = [
-  { id: 's1', pos: 12, nm: '428', color: '#4477ee' },
-  { id: 's2', pos: 29, nm: '524', color: '#00bb66' },
-  { id: 's3', pos: 48, nm: '573', color: '#aacc00' },
-  { id: 's4', pos: 66, nm: '648', color: '#ff4422' },
-  { id: 's5', pos: 83, nm: '712', color: '#cc33aa' },
+// ── Puzzle data ────────────────────────────────────────────────────────────────
+// Math verified: summing correct bars equals target exactly.
+// r1-a + r1-b = [2,4,1,3,0,2] ✓
+// r2-a+b+c+d  = [3,1,4,0,2,3] ✓  (d is subtractive)
+// r3-a…f      = [2,3,1,4,2,3] ✓  (d,f subtractive)
+const ROUND_DATA = [
+  {
+    id: 1, label: 'COMPOUND IDENTIFICATION',
+    target:     [2, 4, 1, 3, 0, 2],
+    slotsCount: 2,
+    fragments: [
+      { id:'r1-a', bars:[ 1, 2, 1, 2, 0, 1] },  // ✓ correct
+      { id:'r1-b', bars:[ 1, 2, 0, 1, 0, 1] },  // ✓ correct
+      { id:'r1-c', bars:[ 2, 2, 1, 2, 0, 1] },
+      { id:'r1-d', bars:[ 1, 3, 0, 1, 0, 1] },
+      { id:'r1-e', bars:[ 1, 2, 0, 2, 0, 2] },
+      { id:'r1-f', bars:[ 0, 1, 1, 1, 0, 1] },
+      { id:'r1-g', bars:[-1, 1, 0, 0, 0, 0] },
+      { id:'r1-h', bars:[ 2, 3, 1, 2, 0, 1] },
+      { id:'r1-i', bars:[ 1, 1, 1, 2, 0, 1] },
+      { id:'r1-j', bars:[ 1, 2, 1, 1, 0, 0] },
+    ],
+  },
+  {
+    id: 2, label: 'CATALYST TRACE',
+    target:     [3, 1, 4, 0, 2, 3],
+    slotsCount: 4,
+    fragments: [
+      { id:'r2-a', bars:[ 2, 0, 2, 0, 1, 2] },  // ✓
+      { id:'r2-b', bars:[ 1, 0, 1, 0, 1, 1] },  // ✓
+      { id:'r2-c', bars:[ 1, 1, 2, 0, 1, 1] },  // ✓
+      { id:'r2-d', bars:[-1, 0,-1, 0,-1,-1] },  // ✓ subtractive
+      { id:'r2-e', bars:[ 2, 0, 3, 0, 1, 2] },
+      { id:'r2-f', bars:[ 1, 1, 1, 0, 1, 1] },
+      { id:'r2-g', bars:[-1, 0,-2, 0,-1,-1] },
+      { id:'r2-h', bars:[ 2, 1, 2, 0, 1, 2] },
+      { id:'r2-i', bars:[ 1, 0, 1, 0, 0, 1] },
+      { id:'r2-j', bars:[-2, 0,-1, 0,-1,-2] },
+    ],
+  },
+  {
+    id: 3, label: 'MUTATION MARKER',
+    target:     [2, 3, 1, 4, 2, 3],
+    slotsCount: 6,
+    fragments: [
+      { id:'r3-a', bars:[ 1, 1, 1, 2, 1, 1] },  // ✓
+      { id:'r3-b', bars:[ 1, 1, 0, 1, 1, 1] },  // ✓
+      { id:'r3-c', bars:[ 2, 1, 1, 2, 1, 2] },  // ✓
+      { id:'r3-d', bars:[-1, 1, 0, 0, 0, 0] },  // ✓ subtractive
+      { id:'r3-e', bars:[ 0, 0, 0, 1, 0, 1] },  // ✓
+      { id:'r3-f', bars:[-1,-1,-1,-2,-1,-2] },  // ✓ subtractive
+      { id:'r3-g', bars:[ 2, 1, 1, 2, 1, 1] },
+      { id:'r3-h', bars:[-1,-1, 0,-1, 0,-1] },
+      { id:'r3-i', bars:[ 1, 2, 1, 2, 1, 2] },
+      { id:'r3-j', bars:[ 0, 1, 0, 1, 1, 1] },
+    ],
+  },
 ]
 
-const FRAG_BANK = [
-  { id: 'f1', nm: '428', color: '#4477ee', correctSlot: 's1' },
-  { id: 'f2', nm: '524', color: '#00bb66', correctSlot: 's2' },
-  { id: 'f3', nm: '573', color: '#aacc00', correctSlot: 's3' },
-  { id: 'f4', nm: '648', color: '#ff4422', correctSlot: 's4' },
-  { id: 'f5', nm: '712', color: '#cc33aa', correctSlot: 's5' },
-  { id: 'f6', nm: '491', color: '#00cccc', correctSlot: null }, // decoy
-  { id: 'f7', nm: '688', color: '#ee2255', correctSlot: null }, // decoy
-]
-
-function shuffled(arr) {
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function shuffle(arr) {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -33,503 +75,334 @@ function shuffled(arr) {
   return a
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// PHASE 2 — EXPERIMENT LOG
-// SIGMA-4 shows readings spiking into red zone
-// ══════════════════════════════════════════════════════════════════════════════
+function computeResult(placements, frags) {
+  const result = Array(NUM_COLS).fill(0)
+  placements.forEach(id => {
+    if (!id) return
+    const f = frags.find(x => x.id === id)
+    if (f) f.bars.forEach((v, i) => { result[i] += v })
+  })
+  return result
+}
 
-const EXPERIMENTS = [
-  { id: 'ALPHA-1', readings: [12, 14, 13, 15, 13, 14, 12], anomalous: false },
-  { id: 'BETA-2',  readings: [20, 19, 21, 20, 22, 20, 21], anomalous: false },
-  { id: 'GAMMA-3', readings: [8,  9,  8,  10, 9,  8,  9 ], anomalous: false },
-  { id: 'SIGMA-4', readings: [11, 14, 29, 52, 84, 91, 88], anomalous: true  },
-  { id: 'DELTA-5', readings: [17, 16, 18, 17, 16, 18, 17], anomalous: false },
-]
-const RED_THRESHOLD = 40
+// ── Fragment mini-chart (positive bars up, negative bars down from midline) ────
+function FragChart({ bars }) {
+  const vw = NUM_COLS * 10
+  const vh = 28
+  const mid = 14
+  const scale = 12 / MAX_VAL
+  return (
+    <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
+      <line x1="0" y1={mid} x2={vw} y2={mid} stroke="#1a2a1a" strokeWidth="0.8"/>
+      {bars.map((v, i) => {
+        const x = i * 10 + 1
+        const bw = 8
+        if (v > 0) {
+          const h = v * scale
+          return <rect key={i} x={x} y={mid - h} width={bw} height={h}
+            fill={COL_COLORS[i]} opacity="0.88"/>
+        }
+        if (v < 0) {
+          const h = (-v) * scale
+          return <rect key={i} x={x} y={mid} width={bw} height={h}
+            fill="#c1121f" opacity="0.85"/>
+        }
+        return null
+      })}
+    </svg>
+  )
+}
 
-// ══════════════════════════════════════════════════════════════════════════════
-// PHASE 3 — DNA STRAND MUTATION
-// SAMPLE-3 has G→C at position 2 (0-indexed)
-// ══════════════════════════════════════════════════════════════════════════════
+// ── Main spectrum chart (target or live result) ────────────────────────────────
+function SpecChart({ bars, target }) {
+  const vw = NUM_COLS * 20
+  const vh = 48
+  const base = vh - 2
+  const scale = (vh - 8) / MAX_VAL
+  return (
+    <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
+      {/* Column tints */}
+      {COL_COLORS.map((c, i) => (
+        <rect key={i} x={i * 20} y={0} width={20} height={vh} fill={c} opacity="0.04"/>
+      ))}
+      {/* Target dashed reference lines (on result chart only) */}
+      {target && target.map((t, i) => {
+        if (t === 0) return null
+        const ty = base - t * scale
+        return (
+          <line key={i}
+            x1={i * 20 + 1} y1={ty} x2={i * 20 + 19} y2={ty}
+            stroke={COL_COLORS[i]} strokeWidth="1.2" strokeDasharray="3,2" opacity="0.55"/>
+        )
+      })}
+      {/* Bars */}
+      {bars.map((v, i) => {
+        const clamped = Math.max(0, Math.min(v, MAX_VAL + 1))
+        const barH = Math.max(1, clamped * scale)
+        let fill = COL_COLORS[i], op = 0.75
+        if (target) {
+          if      (v === target[i]) { fill = COL_COLORS[i]; op = 0.92 }
+          else if (v  >  target[i]) { fill = '#c1121f';     op = 0.85 }
+          else                       { fill = '#334499';     op = 0.75 }
+        }
+        return <rect key={i} x={i * 20 + 2} y={base - barH} width={16} height={barH}
+          fill={fill} opacity={op}/>
+      })}
+      <line x1="0" y1={base} x2={vw} y2={base} stroke="#1a2a1a" strokeWidth="0.8"/>
+    </svg>
+  )
+}
 
-const BASE_COLORS = { A: '#4477ee', T: '#ff4422', G: '#00bb66', C: '#cc33aa' }
-const REF_STRAND  = ['A','T','G','C','A','G','T','C','A','T']
-
-const DNA_SAMPLES = [
-  { id: 'strand-1', label: 'SAMPLE-1', bases: ['A','T','G','C','A','G','T','C','A','T'], mutated: false },
-  { id: 'strand-2', label: 'SAMPLE-2', bases: ['A','T','G','C','A','G','T','C','A','T'], mutated: false },
-  { id: 'strand-3', label: 'SAMPLE-3', bases: ['A','T','C','C','A','G','T','C','A','T'], mutated: true  },
-  { id: 'strand-4', label: 'SAMPLE-4', bases: ['A','T','G','C','A','G','T','C','A','T'], mutated: false },
-]
-
-const ANSWER_CODE = 'LAB-07'
-
-// ══════════════════════════════════════════════════════════════════════════════
-// COMPONENT
-// ══════════════════════════════════════════════════════════════════════════════
-
+// ── Component ──────────────────────────────────────────────────────────────────
 export default function LifeSupportModule({ onSolve, onBack }) {
-  // ── Global phase ───────────────────────────────────────────────────────────
-  const [phase, setPhase] = useState(1)
+  const [rounds]  = useState(() =>
+    ROUND_DATA.map(r => ({ ...r, fragments: shuffle([...r.fragments]) }))
+  )
+  const [roundIdx,    setRoundIdx]    = useState(0)
+  const [placements,  setPlacements]  = useState(Array(ROUND_DATA[0].slotsCount).fill(null))
+  const [selected,    setSelected]    = useState(null)
+  const [error,       setError]       = useState(false)
+  const [roundWin,    setRoundWin]    = useState(false)
+  const [solved,      setSolved]      = useState(false)
+  const [showFrag,    setShowFrag]    = useState(false)
+  const dragRef = useRef(null)
 
-  // ── Phase 1 ────────────────────────────────────────────────────────────────
-  const [frags]      = useState(() => shuffled(FRAG_BANK))
-  const [placements, setPlacements] = useState({})      // slotId → fragId
-  const [selected,   setSelected]   = useState(null)    // fragId in "hand"
-  const [p1Error,    setP1Error]    = useState(false)
-  const dragRef                     = useRef(null)       // { fragId, fromSlot }
+  const round    = rounds[roundIdx]
+  const placedSet = new Set(placements.filter(Boolean))
+  const bankFrags = round.fragments.filter(f => !placedSet.has(f.id) && f.id !== selected)
+  const result    = computeResult(placements, round.fragments)
+  const allFilled = placements.every(p => p !== null)
+  const isMatch   = allFilled && result.every((v, i) => v === round.target[i])
 
-  const placedSet     = new Set(Object.values(placements))
-  const bankFrags     = frags.filter(f => !placedSet.has(f.id) && f.id !== selected)
-  const allFilled     = SLOTS.every(s => placements[s.id])
-
-  function pickUpFrag(fragId, fromSlotId = null) {
-    if (fromSlotId) {
-      setPlacements(prev => { const n = { ...prev }; delete n[fromSlotId]; return n })
-    }
-    setSelected(prev => (prev === fragId && !fromSlotId) ? null : fragId)
+  // ── Click: select from bank ──────────────────────────────────────────────
+  function clickFrag(fragId) {
+    setSelected(prev => prev === fragId ? null : fragId)
   }
 
-  function handleSlotClick(slotId) {
+  // ── Click: slot ─────────────────────────────────────────────────────────
+  function clickSlot(slotIdx) {
     if (selected) {
       setPlacements(prev => {
-        const n = { ...prev }
-        Object.keys(n).forEach(k => { if (n[k] === selected) delete n[k] })
-        n[slotId] = selected
+        const n = [...prev]
+        const from = n.indexOf(selected)
+        if (from !== -1) n[from] = null
+        n[slotIdx] = selected
         return n
       })
       setSelected(null)
-    } else if (placements[slotId]) {
-      pickUpFrag(placements[slotId], slotId)
+    } else if (placements[slotIdx]) {
+      setSelected(placements[slotIdx])
+      setPlacements(prev => { const n = [...prev]; n[slotIdx] = null; return n })
     }
   }
 
-  function onDragStart(e, fragId, fromSlot = null) {
-    dragRef.current = { fragId, fromSlot }
+  // ── Drag ─────────────────────────────────────────────────────────────────
+  function onDragStart(e, fragId, slotIdx = null) {
+    dragRef.current = { fragId, slotIdx }
     e.dataTransfer.effectAllowed = 'move'
   }
-
   function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move' }
-
-  function onDropSlot(e, slotId) {
+  function onDropSlot(e, targetIdx) {
     e.preventDefault()
     if (!dragRef.current) return
-    const { fragId, fromSlot } = dragRef.current
+    const { fragId, slotIdx: src } = dragRef.current
     setPlacements(prev => {
-      const n = { ...prev }
-      if (fromSlot) delete n[fromSlot]
-      Object.keys(n).forEach(k => { if (n[k] === fragId) delete n[k] })
-      n[slotId] = fragId
+      const n = [...prev]
+      if (src !== null) n[src] = null
+      n[targetIdx] = fragId
       return n
     })
-    dragRef.current = null
-    setSelected(null)
+    setSelected(null); dragRef.current = null
   }
-
   function onDropBank(e) {
     e.preventDefault()
     if (!dragRef.current) return
-    const { fragId, fromSlot } = dragRef.current
-    if (fromSlot) {
-      setPlacements(prev => { const n = { ...prev }; if (n[fromSlot] === fragId) delete n[fromSlot]; return n })
+    const { fragId, slotIdx: src } = dragRef.current
+    if (src !== null) {
+      setPlacements(prev => { const n = [...prev]; n[src] = null; return n })
     }
-    dragRef.current = null
+    setSelected(null); dragRef.current = null
   }
 
-  function submitPhase1() {
-    const correct = SLOTS.every(s => {
-      const f = FRAG_BANK.find(x => x.id === placements[s.id])
-      return f && f.correctSlot === s.id
-    })
-    if (correct) {
-      setPhase(2)
+  // ── Submit ────────────────────────────────────────────────────────────────
+  function handleSubmit() {
+    if (!allFilled) return
+    if (isMatch) {
+      setRoundWin(true)
+      setTimeout(() => {
+        setRoundWin(false)
+        const next = roundIdx + 1
+        if (next < ROUND_DATA.length) {
+          setRoundIdx(next)
+          setPlacements(Array(ROUND_DATA[next].slotsCount).fill(null))
+          setSelected(null); setError(false)
+        } else {
+          setSolved(true)
+          setTimeout(() => setShowFrag(true), 800)
+        }
+      }, 1400)
     } else {
-      setP1Error(true)
-      setTimeout(() => setP1Error(false), 1600)
+      setError(true)
+      setTimeout(() => setError(false), 1600)
     }
   }
 
-  // ── Phase 2 ────────────────────────────────────────────────────────────────
-  const [selectedExp, setSelectedExp] = useState(null)
-  const [p2Error,     setP2Error]     = useState(false)
-
-  function submitPhase2() {
-    const exp = EXPERIMENTS.find(e => e.id === selectedExp)
-    if (exp?.anomalous) {
-      setPhase(3)
-    } else {
-      setP2Error(true)
-      setSelectedExp(null)
-      setTimeout(() => setP2Error(false), 1600)
-    }
-  }
-
-  // ── Phase 3 ────────────────────────────────────────────────────────────────
-  const [selectedStrand,  setSelectedStrand]  = useState(null)
-  const [strandConfirmed, setStrandConfirmed] = useState(false)
-  const [p3Error,         setP3Error]         = useState(false)
-  const [solved,          setSolved]          = useState(false)
-  const [showFrag,        setShowFrag]        = useState(false)
-
-  function confirmStrand() {
-    const s = DNA_SAMPLES.find(x => x.id === selectedStrand)
-    if (s?.mutated) {
-      setStrandConfirmed(true)
-    } else {
-      setP3Error(true)
-      setSelectedStrand(null)
-      setTimeout(() => setP3Error(false), 1600)
-    }
-  }
-
-  function confirmCause(expId) {
-    if (expId === 'SIGMA-4') {
-      setSolved(true)
-      setTimeout(() => setShowFrag(true), 800)
-    } else {
-      setP3Error(true)
-      setTimeout(() => setP3Error(false), 1600)
-    }
-  }
-
-  // ── Dev skip ───────────────────────────────────────────────────────────────
+  // ── Dev skip ─────────────────────────────────────────────────────────────
   function devSkip() {
-    if (phase === 1)                          setPhase(2)
-    else if (phase === 2)                     setPhase(3)
-    else if (phase === 3 && !strandConfirmed) { setSelectedStrand('strand-3'); setStrandConfirmed(true) }
-    else if (phase === 3 && !solved)          { setSolved(true); setTimeout(() => setShowFrag(true), 300) }
+    if (solved || roundWin) return
+    const next = roundIdx + 1
+    if (next < ROUND_DATA.length) {
+      setRoundIdx(next)
+      setPlacements(Array(ROUND_DATA[next].slotsCount).fill(null))
+      setSelected(null); setError(false)
+    } else {
+      setSolved(true)
+      setTimeout(() => setShowFrag(true), 300)
+    }
   }
 
-  const statusLabel = solved           ? '✓ ANALYSIS COMPLETE' :
-                      phase === 3      ? 'DNA ANALYSIS'         :
-                      phase === 2      ? 'EXPERIMENT LOG'       :
-                                         'SPECTROGRAPH RECON'
+  const statusText = solved ? '✓ ANALYSIS COMPLETE'
+    : roundWin ? '✓ PATTERN MATCHED'
+    : `SCAN ${roundIdx + 1} / 3`
 
   return (
     <div className="ls-module">
       {!solved && <button className="dev-skip-btn" onClick={devSkip}>⚡ DEV</button>}
 
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="ls-header">
         <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
         <span className="pm-title terminal-text">MODULE 04 — LIFE SUPPORT</span>
-        <span className={`ls-status terminal-text ${solved ? 'ls-status--restored' : ''}`}>
-          {statusLabel}
+        <span className={`ls-status terminal-text ${solved ? 'ls-status--restored' : roundWin ? 'ls-status--matched' : ''}`}>
+          {statusText}
         </span>
       </div>
 
-      {/* ── Phase indicator ── */}
+      {/* Round pips */}
       {!solved && (
-        <div className="ls-phase-bar">
-          {[1, 2, 3].map(p => (
-            <div key={p} className={`ls-phase-pip terminal-text ${phase >= p ? 'ls-phase-pip--done' : ''} ${phase === p ? 'ls-phase-pip--active' : ''}`}>
-              {p}
+        <div className="ls-round-bar">
+          {ROUND_DATA.map((r, i) => (
+            <div key={r.id} className={`ls-round-pip terminal-text
+              ${i < roundIdx ? 'ls-round-pip--done' : ''}
+              ${i === roundIdx ? 'ls-round-pip--active' : ''}`}>
+              {i < roundIdx ? '✓' : i + 1}
             </div>
           ))}
-          <span className="terminal-text terminal-text--dim ls-phase-label">
-            {phase === 1 ? '— COMPOUND IDENTIFICATION' : phase === 2 ? '— EXPERIMENT LOG' : '— DNA ANALYSIS'}
+          <span className="terminal-text terminal-text--dim ls-round-label">
+            — {round.label}
+          </span>
+          <span className="terminal-text terminal-text--dim ls-round-req">
+            {round.slotsCount} FRAGS
           </span>
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          PHASE 1 — SPECTROGRAPH
-         ══════════════════════════════════════════════════════════════════════ */}
-      {phase === 1 && (
+      {/* ── Active puzzle ── */}
+      {!solved && !roundWin && (
         <div className="ls-body">
+
+          {/* Side-by-side spectra */}
+          <div className="ls-spectra-row">
+            <div className="ls-spectrum-panel">
+              <div className="ls-spec-label terminal-text terminal-text--dim">TARGET</div>
+              <div className="ls-spec-chart">
+                <SpecChart bars={round.target} target={null}/>
+              </div>
+            </div>
+            <div className="ls-spec-divider"/>
+            <div className="ls-spectrum-panel">
+              <div className="ls-spec-label terminal-text terminal-text--dim">CURRENT</div>
+              <div className="ls-spec-chart">
+                <SpecChart bars={result} target={round.target}/>
+              </div>
+            </div>
+          </div>
+
+          {/* Slots */}
           <div className="ls-section-label terminal-text">
-            // COMPOUND SPECTROGRAPH — RECONSTRUCT VITAGEN-7 SIGNATURE
+            ACTIVE SLOTS — {placements.filter(Boolean).length}/{round.slotsCount} PLACED:
           </div>
-          <div className="ls-section-sub terminal-text terminal-text--dim">
-            DRAG OR CLICK-SELECT FRAGMENTS — PLACE IN MATCHING REFERENCE SLOTS
-          </div>
-
-          {/* Reference spectrum bar */}
-          <div className="ls-spectrum-wrap">
-            <svg className="ls-spectrum-svg" viewBox="0 0 300 42" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="specGrad" x1="0" x2="1" y1="0" y2="0">
-                  <stop offset="0%"   stopColor="#180050" />
-                  <stop offset="14%"  stopColor="#1133bb" />
-                  <stop offset="30%"  stopColor="#0077bb" />
-                  <stop offset="47%"  stopColor="#008844" />
-                  <stop offset="57%"  stopColor="#88aa00" />
-                  <stop offset="68%"  stopColor="#cc5500" />
-                  <stop offset="84%"  stopColor="#aa0000" />
-                  <stop offset="100%" stopColor="#330011" />
-                </linearGradient>
-              </defs>
-              <rect x="0" y="6" width="300" height="22" fill="url(#specGrad)" opacity="0.35" />
-              {SLOTS.map(s => (
-                <g key={s.id}>
-                  <line x1={s.pos * 3} y1="2" x2={s.pos * 3} y2="30"
-                    stroke={s.color} strokeWidth="2.5" opacity="0.9" />
-                  <text x={s.pos * 3} y="40" textAnchor="middle"
-                    fontSize="6" fill={s.color} opacity="0.75" fontFamily="monospace">
-                    {s.nm}nm
-                  </text>
-                </g>
-              ))}
-            </svg>
-          </div>
-
-          {/* Slot targets */}
           <div className="ls-slots">
-            {SLOTS.map((s, i) => {
-              const pf = placements[s.id] ? FRAG_BANK.find(f => f.id === placements[s.id]) : null
-              const isTarget = !!selected
+            {placements.map((fragId, si) => {
+              const f = fragId ? round.fragments.find(x => x.id === fragId) : null
               return (
-                <div
-                  key={s.id}
-                  className={`ls-slot ${pf ? 'ls-slot--filled' : ''} ${isTarget && !pf ? 'ls-slot--target' : ''}`}
-                  onClick={() => handleSlotClick(s.id)}
+                <div key={si}
+                  className={`ls-slot ${f ? 'ls-slot--filled' : ''} ${selected && !f ? 'ls-slot--target' : ''}`}
+                  onClick={() => clickSlot(si)}
                   onDragOver={onDragOver}
-                  onDrop={e => onDropSlot(e, s.id)}
+                  onDrop={e => onDropSlot(e, si)}
                 >
-                  {pf ? (
-                    <div
-                      className="ls-frag-placed terminal-text"
-                      style={{ color: pf.color, borderColor: pf.color + '66' }}
-                      draggable
-                      onDragStart={e => { e.stopPropagation(); onDragStart(e, pf.id, s.id) }}
-                      onClick={e => { e.stopPropagation(); pickUpFrag(pf.id, s.id) }}
-                    >
-                      {pf.nm}nm
-                    </div>
-                  ) : (
-                    <span className="ls-slot-num terminal-text terminal-text--dim">{i + 1}</span>
-                  )}
+                  {f
+                    ? <div className="ls-slot-frag"
+                        draggable
+                        onDragStart={e => { e.stopPropagation(); onDragStart(e, f.id, si) }}
+                        onClick={e => { e.stopPropagation(); clickSlot(si) }}>
+                        <FragChart bars={f.bars}/>
+                        {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
+                      </div>
+                    : <span className="ls-slot-num terminal-text terminal-text--dim">{si + 1}</span>
+                  }
                 </div>
               )
             })}
           </div>
 
-          {/* Fragment bank */}
+          {/* Bank */}
+          <div className="ls-bank-header terminal-text terminal-text--dim">
+            FRAGMENT BANK — {bankFrags.length + (selected ? 1 : 0)} AVAILABLE:
+          </div>
           <div className="ls-bank" onDragOver={onDragOver} onDrop={onDropBank}>
-            <div className="ls-bank-label terminal-text terminal-text--dim">
-              FRAGMENT BANK — {bankFrags.length + (selected ? 1 : 0)} UNPLACED
-            </div>
-            <div className="ls-frag-grid">
-              {selected && (() => {
-                const f = FRAG_BANK.find(x => x.id === selected)
-                return (
-                  <div
-                    key={f.id}
-                    className="ls-frag ls-frag--selected"
-                    style={{ color: f.color, borderColor: f.color }}
-                    draggable
-                    onDragStart={e => onDragStart(e, f.id)}
-                    onClick={() => setSelected(null)}
-                  >
-                    {f.nm}nm
-                  </div>
-                )
-              })()}
-              {bankFrags.map(f => (
-                <div
-                  key={f.id}
-                  className="ls-frag"
-                  style={{ color: f.color, borderColor: f.color + '66' }}
+            {/* Selected frag shown in bank highlighted */}
+            {selected && (() => {
+              const f = round.fragments.find(x => x.id === selected)
+              return (
+                <div key={f.id} className="ls-frag ls-frag--selected"
                   draggable
                   onDragStart={e => onDragStart(e, f.id)}
-                  onClick={() => pickUpFrag(f.id)}
-                >
-                  {f.nm}nm
+                  onClick={() => setSelected(null)}>
+                  <FragChart bars={f.bars}/>
+                  {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
                 </div>
-              ))}
-            </div>
+              )
+            })()}
+            {bankFrags.map(f => (
+              <div key={f.id} className="ls-frag"
+                draggable
+                onDragStart={e => onDragStart(e, f.id)}
+                onClick={() => clickFrag(f.id)}>
+                <FragChart bars={f.bars}/>
+                {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
+              </div>
+            ))}
           </div>
 
-          {p1Error && (
-            <div className="ls-error terminal-text">⚠ FRAGMENT MISMATCH — CHECK WAVELENGTH POSITIONS</div>
+          {error && (
+            <div className="ls-error terminal-text">⚠ SPECTRUM MISMATCH — ADJUST FRAGMENT SELECTION</div>
           )}
 
           <button
-            className={`ls-submit terminal-text ${allFilled ? 'ls-submit--ready' : ''} ${p1Error ? 'ls-submit--error' : ''}`}
+            className={`ls-submit terminal-text ${allFilled ? 'ls-submit--ready' : ''} ${error ? 'ls-submit--error' : ''}`}
             disabled={!allFilled}
-            onClick={submitPhase1}
-          >
-            [ CONFIRM COMPOUND RECONSTRUCTION ]
+            onClick={handleSubmit}>
+            [ SUBMIT SPECTRAL ANALYSIS ]
           </button>
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          PHASE 2 — EXPERIMENT LOG
-         ══════════════════════════════════════════════════════════════════════ */}
-      {phase === 2 && (
-        <div className="ls-body">
-          <div className="ls-section-label terminal-text">
-            // EXPERIMENT LOG — VITAGEN-7 SYNTHESIS TRIALS
+      {/* ── Round win flash ── */}
+      {roundWin && (
+        <div className="ls-body ls-win-body">
+          <div className="terminal-text ls-win-text">✓ PATTERN MATCH CONFIRMED</div>
+          <div className="terminal-text terminal-text--dim ls-win-sub">
+            ADVANCING TO SCAN {roundIdx + 2}...
           </div>
-          <div className="ls-section-sub terminal-text terminal-text--dim">
-            REVIEW 5 TRIAL BATCHES — SELECT THE EXPERIMENT WITH ANOMALOUS READINGS
-          </div>
-
-          <div className="ls-exp-grid">
-            {EXPERIMENTS.map(exp => (
-              <div
-                key={exp.id}
-                className={`ls-exp-card ${selectedExp === exp.id ? 'ls-exp-card--selected' : ''}`}
-                onClick={() => setSelectedExp(exp.id)}
-              >
-                <div className="ls-exp-id terminal-text">{exp.id}</div>
-                <svg className="ls-exp-chart" viewBox="0 0 72 34" preserveAspectRatio="none">
-                  {/* Red zone ceiling */}
-                  <rect x="0" y="0" width="72"
-                    height={34 * (1 - RED_THRESHOLD / 100)}
-                    fill="rgba(193,18,31,0.07)"
-                  />
-                  <line
-                    x1="0" y1={34 * (1 - RED_THRESHOLD / 100)}
-                    x2="72" y2={34 * (1 - RED_THRESHOLD / 100)}
-                    stroke="#c1121f" strokeWidth="0.6" strokeDasharray="3,2" opacity="0.5"
-                  />
-                  {/* Bars */}
-                  {exp.readings.map((r, i) => {
-                    const h = (r / 100) * 32
-                    return (
-                      <rect
-                        key={i}
-                        x={2 + i * 10} y={32 - h}
-                        width={7} height={h}
-                        fill={r >= RED_THRESHOLD ? '#c1121f' : '#2a4a2a'}
-                        opacity="0.9"
-                      />
-                    )
-                  })}
-                </svg>
-              </div>
-            ))}
-          </div>
-
-          {p2Error && (
-            <div className="ls-error terminal-text">⚠ READINGS WITHIN NORMAL RANGE — REANALYSE</div>
-          )}
-
-          <button
-            className={`ls-submit terminal-text ${selectedExp ? 'ls-submit--ready' : ''} ${p2Error ? 'ls-submit--error' : ''}`}
-            disabled={!selectedExp}
-            onClick={submitPhase2}
-          >
-            [ FLAG EXPERIMENT AS ANOMALOUS ]
-          </button>
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          PHASE 3 — DNA STRAND MUTATION
-         ══════════════════════════════════════════════════════════════════════ */}
-      {phase === 3 && (
-        <div className="ls-body">
-          <div className="ls-section-label terminal-text">
-            // DNA STRAND ANALYSIS — VITAGEN-7 SYNTHESIS BATCH
-          </div>
-          <div className="ls-section-sub terminal-text terminal-text--dim">
-            {!strandConfirmed
-              ? 'COMPARE SAMPLES TO REFERENCE STRAND — LOCATE THE MUTATION'
-              : 'MUTATION CONFIRMED — SELECT EXPERIMENT RESPONSIBLE'}
-          </div>
-
-          {/* Reference strand */}
-          <div className="ls-dna-row ls-dna-row--ref">
-            <span className="ls-dna-label terminal-text terminal-text--dim">REF</span>
-            <div className="ls-dna-bases">
-              {REF_STRAND.map((b, i) => (
-                <div
-                  key={i}
-                  className="ls-base"
-                  style={{
-                    background: BASE_COLORS[b] + '22',
-                    borderColor: BASE_COLORS[b] + '77',
-                    color: BASE_COLORS[b],
-                  }}
-                >
-                  {b}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="ls-dna-divider" />
-
-          {/* Sample strands */}
-          <div className="ls-dna-samples">
-            {DNA_SAMPLES.map(sample => (
-              <div
-                key={sample.id}
-                className={`ls-dna-row ${!strandConfirmed ? 'ls-dna-row--clickable' : ''} ${selectedStrand === sample.id ? 'ls-dna-row--selected' : ''}`}
-                onClick={() => !strandConfirmed && setSelectedStrand(sample.id)}
-              >
-                <span className="ls-dna-label terminal-text">{sample.label}</span>
-                <div className="ls-dna-bases">
-                  {sample.bases.map((b, i) => {
-                    const mut = b !== REF_STRAND[i]
-                    return (
-                      <div
-                        key={i}
-                        className={`ls-base ${mut ? 'ls-base--mutated' : ''}`}
-                        style={{
-                          background: mut ? 'rgba(193,18,31,0.18)' : BASE_COLORS[b] + '18',
-                          borderColor: mut ? '#c1121f'              : BASE_COLORS[b] + '55',
-                          color:       mut ? '#c1121f'              : BASE_COLORS[b] + 'bb',
-                        }}
-                      >
-                        {b}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Confirm mutation button */}
-          {!strandConfirmed && (
-            <>
-              {p3Error && (
-                <div className="ls-error terminal-text">⚠ STRAND MATCHES REFERENCE — CONTINUE ANALYSIS</div>
-              )}
-              <button
-                className={`ls-submit terminal-text ${selectedStrand ? 'ls-submit--ready' : ''} ${p3Error ? 'ls-submit--error' : ''}`}
-                disabled={!selectedStrand}
-                onClick={confirmStrand}
-              >
-                [ CONFIRM MUTATION ]
-              </button>
-            </>
-          )}
-
-          {/* Cause selection */}
-          {strandConfirmed && !solved && (
-            <div className="ls-cause-section">
-              <div className="ls-section-label terminal-text">SELECT RESPONSIBLE EXPERIMENT:</div>
-              <div className="ls-cause-btns">
-                {EXPERIMENTS.map(exp => (
-                  <button
-                    key={exp.id}
-                    className="ls-cause-btn terminal-text"
-                    onClick={() => confirmCause(exp.id)}
-                  >
-                    {exp.id}
-                  </button>
-                ))}
-              </div>
-              {p3Error && (
-                <div className="ls-error terminal-text">⚠ NO CAUSAL LINK DETECTED — RECHECK EXPERIMENT LOG</div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          SOLVED
-         ══════════════════════════════════════════════════════════════════════ */}
+      {/* ── Solved ── */}
       {solved && (
         <div className="ls-body">
-          <p className="terminal-text ls-solved__headline">✓ CONTAMINATION SOURCE IDENTIFIED</p>
+          <p className="terminal-text ls-solved__headline">✓ VITAGEN-7 MUTATION SEQUENCE IDENTIFIED</p>
           {showFrag && (
             <div className="ls-fragment">
               <p className="terminal-text ls-fragment__label">◈ MEMORY FRAGMENT 04 RECOVERED</p>
@@ -538,21 +411,20 @@ export default function LifeSupportModule({ onSolve, onBack }) {
                 <span className="terminal-text ls-fragment__value">VITAGEN-7 (MUTATED)</span>
               </div>
               <div className="ls-fragment__row">
-                <span className="terminal-text terminal-text--dim">MUTATION CAUSE:&nbsp;</span>
-                <span className="terminal-text ls-fragment__value">EXPERIMENT SIGMA-4</span>
+                <span className="terminal-text terminal-text--dim">SCANS COMPLETED:&nbsp;</span>
+                <span className="terminal-text ls-fragment__value">3 / 3</span>
               </div>
               <div className="ls-fragment__row">
                 <span className="terminal-text terminal-text--dim">ORIGIN LAB:&nbsp;</span>
-                <span className="terminal-text ls-fragment__value">{ANSWER_CODE}</span>
+                <span className="terminal-text ls-fragment__value">LAB-07</span>
               </div>
-              <button className="ls-confirm terminal-text" onClick={() => onSolve?.(ANSWER_CODE)}>
+              <button className="ls-confirm terminal-text" onClick={() => onSolve?.('LAB-07')}>
                 INTEGRATE FRAGMENT → CONTINUE
               </button>
             </div>
           )}
         </div>
       )}
-
     </div>
   )
 }

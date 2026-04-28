@@ -1,5 +1,5 @@
 /* ============================================
-   LIFE SUPPORT MODULE — Chemical Analysis
+   LIFE SUPPORT MODULE — Spectrograph Puzzle
    ============================================ */
 
 .ls-module {
@@ -24,7 +24,7 @@
   font-size: 0.82rem;
   letter-spacing: 0.12em;
   color: #c1121f;
-  min-width: 140px;
+  min-width: 120px;
   text-align: right;
   transition: color 0.3s;
   animation: glitch-flicker 3.5s linear infinite;
@@ -36,8 +36,14 @@
   text-shadow: 0 0 10px rgba(0,223,216,0.35);
 }
 
-/* ── Phase bar ── */
-.ls-phase-bar {
+.ls-status--matched {
+  color: #00dfd8;
+  animation: none;
+  text-shadow: 0 0 8px rgba(0,223,216,0.4);
+}
+
+/* ── Round indicator bar ── */
+.ls-round-bar {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -46,9 +52,9 @@
   flex-shrink: 0;
 }
 
-.ls-phase-pip {
-  width: 17px;
-  height: 17px;
+.ls-round-pip {
+  width: 18px;
+  height: 18px;
   border: 1px solid #1a2a1a;
   border-radius: 2px;
   display: flex;
@@ -59,18 +65,24 @@
   letter-spacing: 0;
   color: #222a22;
   flex-shrink: 0;
+  transition: border-color 0.2s, color 0.2s;
 }
 
-.ls-phase-pip--done   { border-color: #1e3a1e; color: #2a4a2a; }
-.ls-phase-pip--active { border-color: #2a5a2a; color: #5a9a5a; background: rgba(20,60,20,0.2); }
+.ls-round-pip--done   { border-color: #2a5a2a; color: #4a9a4a; }
+.ls-round-pip--active { border-color: #3a7a3a; color: #6acc6a; background: rgba(20,60,20,0.2); }
 
-.ls-phase-label {
-  font-size: 0.64rem;
-  letter-spacing: 0.08em;
-  margin-left: 2px;
+.ls-round-label {
+  font-size: 0.63rem;
+  letter-spacing: 0.07em;
 }
 
-/* ── Body (shared wrapper) ── */
+.ls-round-req {
+  font-size: 0.60rem;
+  letter-spacing: 0.06em;
+  margin-left: auto;
+}
+
+/* ── Body ── */
 .ls-body {
   flex: 1;
   display: flex;
@@ -80,24 +92,154 @@
   overflow: hidden;
 }
 
-/* ── Section labels ── */
+/* ── Section label ── */
 .ls-section-label {
-  font-size: 0.65rem;
+  font-size: 0.63rem;
   letter-spacing: 0.09em;
   color: #2a3a2a;
   flex-shrink: 0;
 }
 
-.ls-section-sub {
-  font-size: 0.61rem;
+/* ── Spectra side by side ── */
+.ls-spectra-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+
+.ls-spectrum-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ls-spec-label {
+  font-size: 0.60rem;
+  letter-spacing: 0.1em;
+}
+
+.ls-spec-chart {
+  border: 1px solid #0f1a0f;
+  background: rgba(0,4,0,0.28);
+  padding: 2px;
+  height: 52px;
+}
+
+.ls-spec-divider {
+  width: 1px;
+  background: #0f1a0f;
+  flex-shrink: 0;
+}
+
+/* ── Slot targets ── */
+.ls-slots {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.ls-slot {
+  flex: 1;
+  height: 46px;
+  border: 1px solid #1a2a1a;
+  background: rgba(0,4,0,0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  overflow: hidden;
+  padding: 2px;
+  min-width: 0;
+}
+
+.ls-slot:hover          { border-color: #2a4a2a; }
+.ls-slot--target        { border-color: #2a6a2a; border-style: dashed; background: rgba(10,40,10,0.22); }
+.ls-slot--filled        { border-color: #1e3a1e; }
+.ls-slot--filled:hover  { border-color: #3a6a3a; }
+
+.ls-slot-num {
+  font-family: 'VT323', monospace;
+  font-size: 0.75rem;
+  color: #1a2a1a;
+}
+
+.ls-slot-frag {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+}
+
+.ls-slot-frag:hover { opacity: 0.75; }
+.ls-slot-frag:active { cursor: grabbing; }
+
+/* ── Fragment bank ── */
+.ls-bank-header {
+  font-size: 0.60rem;
   letter-spacing: 0.07em;
   flex-shrink: 0;
-  margin-top: -3px;
+}
+
+.ls-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  flex-shrink: 0;
+  border: 1px solid #0f1a0f;
+  background: rgba(0,4,0,0.1);
+  padding: 3px;
+}
+
+.ls-frag {
+  /* 5 per row: (100% - 4 gaps × 3px) / 5 */
+  flex: 0 0 calc(20% - 3px);
+  height: 42px;
+  border: 1px solid #1a2a1a;
+  background: rgba(0,4,0,0.3);
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 2px;
+  position: relative;
+  transition: border-color 0.12s, background 0.12s;
+  overflow: hidden;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.ls-frag:hover  { border-color: #2a5a2a; background: rgba(0,12,0,0.45); }
+.ls-frag:active { cursor: grabbing; }
+
+.ls-frag--selected {
+  border-color: #4aaa4a !important;
+  background: rgba(10,45,10,0.55) !important;
+  box-shadow: 0 0 7px rgba(50,160,50,0.3);
+}
+
+/* SUB label on subtractive fragments */
+.ls-frag-tag {
+  position: absolute;
+  bottom: 1px;
+  right: 2px;
+  font-family: 'VT323', monospace;
+  font-size: 0.50rem;
+  color: #c1121f;
+  letter-spacing: 0;
+  line-height: 1;
+  pointer-events: none;
 }
 
 /* ── Error + Submit ── */
 .ls-error {
-  font-size: 0.70rem;
+  font-size: 0.68rem;
   color: #c1121f !important;
   letter-spacing: 0.1em;
   animation: glitch-flicker 2s linear infinite;
@@ -135,266 +277,27 @@
   animation: nav-shake 0.4s ease;
 }
 
-/* ══════════════════════════════════════════════════════════
-   PHASE 1 — SPECTROGRAPH
-   ══════════════════════════════════════════════════════════ */
-
-.ls-spectrum-wrap {
-  flex-shrink: 0;
-  border: 1px solid #0f1a0f;
-  background: rgba(0,4,0,0.25);
-  padding: 3px 4px 1px;
-}
-
-.ls-spectrum-svg {
-  width: 100%;
-  height: 42px;
-  display: block;
-  overflow: visible;
-}
-
-/* ── Slot targets ── */
-.ls-slots {
-  display: flex;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.ls-slot {
-  flex: 1;
-  height: 40px;
-  border: 1px solid #1a2a1a;
-  background: rgba(0,4,0,0.2);
-  display: flex;
+/* ── Round win flash ── */
+.ls-win-body {
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  gap: 10px;
 }
 
-.ls-slot:hover          { border-color: #2a4a2a; background: rgba(10,30,10,0.25); }
-.ls-slot--target        { border-color: #2a5a2a; background: rgba(15,40,15,0.3); border-style: dashed; }
-.ls-slot--filled        { border-color: #1e3a1e; }
-.ls-slot--filled:hover  { border-color: #3a6a3a; }
-
-.ls-slot-num {
-  font-family: 'VT323', monospace;
-  font-size: 0.82rem;
-  color: #1e2e1e;
+.ls-win-text {
+  font-size: 1.0rem;
+  color: #00dfd8;
+  letter-spacing: 0.14em;
+  text-shadow: 0 0 14px rgba(0,223,216,0.55);
+  animation: nav-fade-in 0.3s ease-out;
 }
 
-.ls-frag-placed {
-  font-family: 'VT323', monospace;
-  font-size: 0.80rem;
-  letter-spacing: 0.1em;
-  padding: 2px 6px;
-  border: 1px solid;
-  background: rgba(0,0,0,0.35);
-  cursor: grab;
-  user-select: none;
-  transition: opacity 0.15s;
-}
-
-.ls-frag-placed:hover { opacity: 0.65; }
-.ls-frag-placed:active { cursor: grabbing; }
-
-/* ── Fragment bank ── */
-.ls-bank {
-  flex-shrink: 0;
-  border: 1px solid #0f1a0f;
-  background: rgba(0,4,0,0.12);
-  padding: 4px 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-height: 36px;
-}
-
-.ls-bank-label {
-  font-size: 0.60rem;
-  letter-spacing: 0.08em;
-}
-
-.ls-frag-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.ls-frag {
-  font-family: 'VT323', monospace;
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
-  padding: 2px 8px;
-  border: 1px solid;
-  background: rgba(0,0,0,0.3);
-  cursor: grab;
-  user-select: none;
-  transition: background 0.12s, box-shadow 0.12s;
-}
-
-.ls-frag:hover { background: rgba(0,0,0,0.5); }
-.ls-frag:active { cursor: grabbing; }
-
-.ls-frag--selected {
-  background: rgba(20,50,20,0.5) !important;
-  box-shadow: 0 0 7px currentColor;
-}
-
-/* ══════════════════════════════════════════════════════════
-   PHASE 2 — EXPERIMENT LOG
-   ══════════════════════════════════════════════════════════ */
-
-.ls-exp-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.ls-exp-card {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 4px 4px 3px;
-  border: 1px solid #1a2a1a;
-  background: rgba(0,4,0,0.2);
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-}
-
-.ls-exp-card:hover        { border-color: #2a4a2a; background: rgba(5,20,5,0.3); }
-.ls-exp-card--selected    { border-color: #3a7a3a; background: rgba(10,35,10,0.4); }
-
-.ls-exp-id {
-  font-family: 'VT323', monospace;
-  font-size: 0.66rem;
-  letter-spacing: 0.04em;
-  color: #3a5a3a;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ls-exp-card--selected .ls-exp-id { color: #5a9a5a; }
-
-.ls-exp-chart {
-  width: 100%;
-  height: 38px;
-  display: block;
-}
-
-/* ══════════════════════════════════════════════════════════
-   PHASE 3 — DNA ANALYSIS
-   ══════════════════════════════════════════════════════════ */
-
-.ls-dna-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  padding: 2px 4px;
-  border: 1px solid transparent;
-  border-radius: 2px;
-  transition: border-color 0.15s, background 0.15s;
-}
-
-.ls-dna-row--ref {
-  border-color: #0f1a0f;
-  background: rgba(0,4,0,0.2);
-}
-
-.ls-dna-row--clickable { cursor: pointer; }
-.ls-dna-row--clickable:hover  { border-color: #1e3a1e; background: rgba(5,18,5,0.25); }
-.ls-dna-row--selected         { border-color: #3a7a3a !important; background: rgba(10,35,10,0.35) !important; }
-
-.ls-dna-divider {
-  flex-shrink: 0;
-  height: 1px;
-  background: #0f1a0f;
-  margin: 1px 0;
-}
-
-.ls-dna-samples {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  flex-shrink: 0;
-}
-
-.ls-dna-label {
-  font-family: 'VT323', monospace;
+.ls-win-sub {
   font-size: 0.70rem;
-  letter-spacing: 0.06em;
-  min-width: 52px;
-  flex-shrink: 0;
-  color: #3a5a3a;
+  letter-spacing: 0.1em;
 }
 
-.ls-dna-row--ref .ls-dna-label { color: #2a3a2a; }
-
-.ls-dna-bases {
-  display: flex;
-  flex: 1;
-  gap: 2px;
-}
-
-.ls-base {
-  flex: 1;
-  height: 18px;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'VT323', monospace;
-  font-size: 0.78rem;
-  letter-spacing: 0;
-  border: 1px solid;
-  border-radius: 1px;
-  transition: border-color 0.15s;
-}
-
-.ls-base--mutated {
-  animation: glitch-flicker 2.5s linear infinite;
-}
-
-/* ── Cause buttons ── */
-.ls-cause-section {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  flex-shrink: 0;
-}
-
-.ls-cause-btns {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.ls-cause-btn {
-  background: none;
-  border: 1px solid #1a2a1a;
-  color: #3a5a3a;
-  font-family: 'VT323', monospace;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  padding: 3px 9px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.ls-cause-btn:hover {
-  border-color: #3a7a3a;
-  color: #6aaa6a;
-  background: rgba(30,80,30,0.1);
-}
-
-/* ══════════════════════════════════════════════════════════
-   SOLVED STATE
-   ══════════════════════════════════════════════════════════ */
-
+/* ── Solved ── */
 .ls-solved__headline {
   font-size: 0.88rem;
   color: #00dfd8;
