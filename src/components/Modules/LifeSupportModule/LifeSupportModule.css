@@ -141,16 +141,13 @@
 
 .ls-slot--row {
   width: 100%;
-  height: 26px;
+  height: 28px;
   border: 1px solid #1a1a1a;
   background: #000;
-  display: flex;
-  align-items: center;
+  position: relative;     /* slot-num overlays absolutely */
   cursor: pointer;
   transition: border-color 0.15s;
   overflow: hidden;
-  padding: 0;
-  gap: 0;
   box-sizing: border-box;
 }
 
@@ -159,25 +156,28 @@
 .ls-slot--filled            { border-color: #222; }
 .ls-slot--filled:hover      { border-color: #444; }
 
+/* Number overlaid in top-left — does NOT shift the SVG */
 .ls-slot-num {
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
   font-family: 'VT323', monospace;
-  font-size: 0.70rem;
+  font-size: 0.68rem;
   color: #1a2a1a;
-  min-width: 14px;
-  text-align: center;
-  flex-shrink: 0;
-  padding: 0 2px;
+  z-index: 2;
+  pointer-events: none;
+  line-height: 1;
 }
 
+/* Frag SVG fills the full slot width from left edge — aligns with strip */
 .ls-slot-frag {
-  flex: 1;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   cursor: grab;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  position: relative;
-  min-width: 0;
 }
 
 .ls-slot-frag:hover { opacity: 0.75; }

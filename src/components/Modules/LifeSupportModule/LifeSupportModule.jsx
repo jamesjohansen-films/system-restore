@@ -92,11 +92,11 @@ function computeResult(placements, frags) {
 }
 
 // ── Spectral line strip ────────────────────────────────────────────────────────
-// Single combined strip: result overlaid on target reference.
-//   result[i] === target[i] > 0  →  white  (match)
-//   result[i] ≠ target[i] && result[i] ≠ 0  →  red   (wrong / bad combo)
-//   target[i] > 0 && result[i] === 0  →  very dim white  (target not yet covered)
-//   both 0  →  nothing (black section in rainbow)
+// Uses <line> + vectorEffect="non-scaling-stroke" so every bar is always
+// the same pixel width regardless of how wide the container is.
+//   matched  → white solid line
+//   wrong    → red solid line
+//   pending  → dim white line (target not yet covered)
 function SpecStrip({ target, result }) {
   const vw = 200, vh = 50
   return (
@@ -106,9 +106,18 @@ function SpecStrip({ target, result }) {
         const wrong   = result[i] !== 0 && result[i] !== target[i]
         const pending = target[i] > 0   && result[i] === 0
 
-        if (matched) return <rect key={i} x={x-4} y={0} width={8} height={vh} fill="white"/>
-        if (wrong)   return <rect key={i} x={x-4} y={0} width={8} height={vh} fill="#c1121f"/>
-        if (pending) return <rect key={i} x={x-4} y={0} width={8} height={vh} fill="rgba(255,255,255,0.12)"/>
+        if (matched) return (
+          <line key={i} x1={x} y1={0} x2={x} y2={vh}
+            stroke="white" strokeWidth="3" vectorEffect="non-scaling-stroke"/>
+        )
+        if (wrong) return (
+          <line key={i} x1={x} y1={0} x2={x} y2={vh}
+            stroke="#c1121f" strokeWidth="3" vectorEffect="non-scaling-stroke"/>
+        )
+        if (pending) return (
+          <line key={i} x1={x} y1={0} x2={x} y2={vh}
+            stroke="rgba(255,255,255,0.22)" strokeWidth="2" vectorEffect="non-scaling-stroke"/>
+        )
         return null
       })}
     </svg>
@@ -116,29 +125,26 @@ function SpecStrip({ target, result }) {
 }
 
 // ── Fragment mini strip ────────────────────────────────────────────────────────
-// Uses the SAME 200-unit viewBox and CHAN_X positions as SpecStrip so bars
-// align directly when both containers share the same rendered width.
-// Additive    : narrow white bar
-// Subtractive : hollow red outline + diagonal slash
+// Same coordinate system as SpecStrip. vectorEffect keeps bars a fixed
+// pixel width so they look the same in narrow tiles and the wide strip.
+//   additive    → white solid line
+//   subtractive → red dashed line (visually distinct from "wrong")
 function FragStrip({ bars }) {
-  const vw = 200, vh = 38
+  const vw = 200, vh = 46
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
       {bars.map((v, i) => {
         if (v === 0) return null
         const x = CHAN_X[i]
-        if (v < 0) {
-          const rx = x - 4, ry = 2, rw = 8, rh = vh - 4
-          return (
-            <g key={i}>
-              <rect x={rx} y={ry} width={rw} height={rh}
-                fill="none" stroke="#c1121f" strokeWidth="1.2"/>
-              <line x1={rx} y1={ry + rh} x2={rx + rw} y2={ry}
-                stroke="#c1121f" strokeWidth="1.2"/>
-            </g>
-          )
-        }
-        return <rect key={i} x={x - 4} y={0} width={8} height={vh} fill="white"/>
+        if (v < 0) return (
+          <line key={i} x1={x} y1={0} x2={x} y2={vh}
+            stroke="#c1121f" strokeWidth="3" strokeDasharray="5 4"
+            vectorEffect="non-scaling-stroke"/>
+        )
+        return (
+          <line key={i} x1={x} y1={0} x2={x} y2={vh}
+            stroke="white" strokeWidth="3" vectorEffect="non-scaling-stroke"/>
+        )
       })}
     </svg>
   )
@@ -320,6 +326,7 @@ export default function LifeSupportModule({ onSolve, onBack }) {
                   onDragOver={onDragOver}
                   onDrop={e => onDropSlot(e, si)}
                 >
+                  {/* Number is absolute so it doesn't shift the SVG */}
                   <span className="ls-slot-num terminal-text terminal-text--dim">{si + 1}</span>
                   {f
                     ? <div className="ls-slot-frag"
@@ -340,30 +347,36 @@ export default function LifeSupportModule({ onSolve, onBack }) {
           <div className="ls-bank-header terminal-text terminal-text--dim">
             FRAGMENT BANK — {bankFrags.length + (selected ? 1 : 0)} AVAILABLE:
           </div>
-          <div className="ls-bank" onDragOver={onDragOver} onDrop={onDropBank}>
-            {/* Selected frag shown in bank highlighted */}
-            {selected && (() => {
-              const f = round.fragments.find(x => x.id === selected)
-              return (
-                <div key={f.id} className="ls-frag ls-frag--selected"
-                  draggable
-                  onDragStart={e => onDragStart(e, f.id)}
-                  onClick={() => setSelected(null)}>
-                  <FragStrip bars={f.bars}/>
-                  {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
-                </div>
-              )
-            })()}
-            {bankFrags.map(f => (
-              <div key={f.id} className="ls-frag"
-                draggable
-                onDragStart={e => onDragStart(e, f.id)}
-                onClick={() => clickFrag(f.id)}>
-                <FragStrip bars={f.bars}/>
-                {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
+          {(() => {
+            // 2 cols for 4 choices, 3 cols for 6, 5 cols for 10
+            const cols = round.bankCount <= 4 ? 2 : round.bankCount <= 6 ? 3 : 5
+            const fragStyle = { flexBasis: `calc(${100 / cols}% - 3px)` }
+            return (
+              <div className="ls-bank" onDragOver={onDragOver} onDrop={onDropBank}>
+                {selected && (() => {
+                  const f = round.fragments.find(x => x.id === selected)
+                  return (
+                    <div key={f.id} className="ls-frag ls-frag--selected"
+                      style={fragStyle} draggable
+                      onDragStart={e => onDragStart(e, f.id)}
+                      onClick={() => setSelected(null)}>
+                      <FragStrip bars={f.bars}/>
+                      {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
+                    </div>
+                  )
+                })()}
+                {bankFrags.map(f => (
+                  <div key={f.id} className="ls-frag"
+                    style={fragStyle} draggable
+                    onDragStart={e => onDragStart(e, f.id)}
+                    onClick={() => clickFrag(f.id)}>
+                    <FragStrip bars={f.bars}/>
+                    {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            )
+          })()}
 
           {error && (
             <div className="ls-error terminal-text">⚠ SPECTRUM MISMATCH — ADJUST FRAGMENT SELECTION</div>
