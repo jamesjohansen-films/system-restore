@@ -2,15 +2,12 @@ import { useState, useRef } from 'react'
 import './LifeSupportModule.css'
 
 // ── Constants ──────────────────────────────────────────────────────────────────
-const NUM_COLS  = 6
-const MAX_VAL   = 5
+const NUM_COLS = 6
+const MAX_VAL  = 5
 
-// Wavelength channel colours (violet → red) and their x-positions
-// in a 200-unit viewBox, evenly distributed
-const CHAN_CLR = ['#9944ff','#4488ff','#00ccdd','#22cc55','#ffaa00','#ff3322']
-const CHAN_X   = [18, 51, 84, 116, 149, 182]
-// Same positions scaled to a 60-unit mini viewBox for fragment tiles
-const CHAN_XF  = CHAN_X.map(x => Math.round((x / 200) * 60))
+// Channel x-positions in the main 200-unit viewBox and the 60-unit frag viewBox
+const CHAN_X  = [22, 54, 86, 118, 150, 182]
+const CHAN_XF = CHAN_X.map(x => Math.round((x / 200) * 60))
 
 // ── Puzzle data ────────────────────────────────────────────────────────────────
 // Math verified: summing correct bars equals target exactly.
@@ -91,49 +88,50 @@ function computeResult(placements, frags) {
   return result
 }
 
-// ── Spectral line strip — the core visual ─────────────────────────────────────
-// Renders vertical glowing lines at wavelength positions.
-// `compareTarget` supplied → result mode (colour = match status).
+// ── Spectral line strip ────────────────────────────────────────────────────────
+// Target mode  (compareTarget = null): white lines at target intensity.
+// Result mode  (compareTarget set):    white = matched, red = wrong.
 function SpecStrip({ values, compareTarget = null }) {
   const vw = 200, vh = 50
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
-      {values.map((v, i) => {
-        const x   = CHAN_X[i]
-        const clamp = Math.max(0, Math.min(v, MAX_VAL))
-        const op    = clamp / MAX_VAL
+      {/* Faint positional tick marks so the player can see all 6 slots */}
+      {CHAN_X.map(x => (
+        <rect key={`tick-${x}`} x={x - 1} y={0} width={2} height={vh}
+          fill="white" opacity="0.04"/>
+      ))}
 
-        // Decide line colour
-        let clr = CHAN_CLR[i]
-        if (compareTarget) {
-          if      (v === compareTarget[i]) clr = CHAN_CLR[i]
-          else if (v  >  compareTarget[i]) clr = '#ff4422'
-          else                              clr = '#334dcc'
+      {values.map((v, i) => {
+        const x      = CHAN_X[i]
+        const clamp  = Math.max(0, Math.min(v, MAX_VAL))
+        const op     = clamp / MAX_VAL
+
+        if (op === 0 && !compareTarget) return null // target: skip empty
+        if (op === 0 && compareTarget && compareTarget[i] === 0) return null // result: skip if target also empty
+
+        // Result mode: colour by match status
+        const match = compareTarget ? (v === compareTarget[i]) : true
+        const clr   = match ? '#ffffff' : '#ff3322'
+
+        // If result is 0 but target expects a line → show very faint placeholder
+        if (op === 0 && compareTarget && compareTarget[i] > 0) {
+          return (
+            <rect key={i} x={x - 1} y={0} width={2} height={vh}
+              fill="#ff3322" opacity="0.12"/>
+          )
         }
 
         return (
           <g key={i}>
-            {/* Outer soft glow */}
-            {op > 0 && (
-              <rect x={x - 6} y={0} width={13} height={vh}
-                fill={clr} opacity={op * 0.15}/>
-            )}
-            {/* Mid glow */}
-            {op > 0 && (
-              <rect x={x - 2} y={0} width={5} height={vh}
-                fill={clr} opacity={op * 0.42}/>
-            )}
-            {/* Core line */}
+            {/* Outer glow */}
+            <rect x={x - 7} y={0} width={14} height={vh}
+              fill={clr} opacity={op * 0.1}/>
+            {/* Inner glow */}
+            <rect x={x - 2} y={0} width={5} height={vh}
+              fill={clr} opacity={op * 0.35}/>
+            {/* Core */}
             <rect x={x - 1} y={0} width={2} height={vh}
-              fill={clr} opacity={Math.max(op > 0 ? 0.08 : 0, op * 0.95)}/>
-
-            {/* Ghost: show where target is when current is too dim */}
-            {compareTarget && compareTarget[i] > 0 && v < compareTarget[i] && (
-              <rect x={x - 1} y={0} width={2} height={vh}
-                fill={CHAN_CLR[i]} opacity={(compareTarget[i] / MAX_VAL) * 0.18}
-                strokeDasharray="5 4"
-                stroke={CHAN_CLR[i]} strokeOpacity="0.25" strokeWidth="1"/>
-            )}
+              fill={clr} opacity={Math.max(0.1, op * 0.92)}/>
           </g>
         )
       })}
@@ -142,21 +140,45 @@ function SpecStrip({ values, compareTarget = null }) {
 }
 
 // ── Fragment mini strip ────────────────────────────────────────────────────────
-// Positive contributions = wavelength colour. Negative = red.
+// Additive : white lines (brightness = intensity).
+// Subtractive : hollow red-bordered rectangle + diagonal slash — NOT filled.
 function FragStrip({ bars }) {
   const vw = 60, vh = 38
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
+      {/* Faint positional ticks */}
+      {CHAN_XF.map(x => (
+        <rect key={`t-${x}`} x={x - 1} y={0} width={2} height={vh}
+          fill="white" opacity="0.05"/>
+      ))}
+
       {bars.map((v, i) => {
         if (v === 0) return null
-        const x   = CHAN_XF[i]
-        const neg = v < 0
-        const op  = Math.abs(v) / MAX_VAL
-        const clr = neg ? '#dd2211' : CHAN_CLR[i]
+        const x  = CHAN_XF[i]
+        const op = Math.abs(v) / MAX_VAL
+
+        if (v < 0) {
+          // Subtractive: outlined hollow rect + slash
+          const rx = x - 3, rw = 7, ry = 2, rh = vh - 4
+          return (
+            <g key={i}>
+              {/* Red border outline — no fill */}
+              <rect x={rx} y={ry} width={rw} height={rh}
+                fill="none" stroke="#c1121f" strokeWidth="1" opacity="0.85"/>
+              {/* Diagonal slash (bottom-left to top-right) */}
+              <line x1={rx} y1={ry + rh} x2={rx + rw} y2={ry}
+                stroke="#c1121f" strokeWidth="1" opacity="0.85"/>
+            </g>
+          )
+        }
+
+        // Additive: white line
         return (
           <g key={i}>
-            <rect x={x - 4} y={0} width={9}  height={vh} fill={clr} opacity={op * 0.18}/>
-            <rect x={x - 1} y={0} width={3}  height={vh} fill={clr} opacity={Math.max(0.12, op * 0.88)}/>
+            <rect x={x - 4} y={0} width={9} height={vh}
+              fill="white" opacity={op * 0.1}/>
+            <rect x={x - 1} y={0} width={2} height={vh}
+              fill="white" opacity={Math.max(0.15, op * 0.82)}/>
           </g>
         )
       })}
@@ -349,7 +371,6 @@ export default function LifeSupportModule({ onSolve, onBack }) {
                         onDragStart={e => { e.stopPropagation(); onDragStart(e, f.id, si) }}
                         onClick={e => { e.stopPropagation(); clickSlot(si) }}>
                         <FragStrip bars={f.bars}/>
-                        {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
                       </div>
                     : <span className="ls-slot-num terminal-text terminal-text--dim">{si + 1}</span>
                   }

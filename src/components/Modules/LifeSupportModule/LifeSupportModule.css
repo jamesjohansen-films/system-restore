@@ -121,20 +121,11 @@
   letter-spacing: 0.1em;
 }
 
-/* Atmospheric dark strip — the SVG sits on top */
 .ls-spec-wrap {
-  border: 1px solid #0a0a18;
+  border: 1px solid #1c1c1c;
   height: 54px;
   overflow: hidden;
-  /* Very faint spectrum atmosphere (violet → red) */
-  background: linear-gradient(to right,
-    #0e0020 0%,
-    #060030 17%,
-    #001820 35%,
-    #001400 52%,
-    #1a0800 72%,
-    #180000 100%
-  );
+  background: #060606;
 }
 
 .ls-spec-divider {
@@ -153,11 +144,8 @@
 .ls-slot {
   flex: 1;
   height: 50px;
-  border: 1px solid #12121e;
-  background: linear-gradient(to right,
-    #0a0018 0%, #040020 17%, #001016 35%,
-    #000e00 52%, #100600 72%, #100000 100%
-  );
+  border: 1px solid #1c1c1c;
+  background: #060606;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,10 +156,10 @@
   min-width: 0;
 }
 
-.ls-slot:hover          { border-color: #2a2a4a; }
-.ls-slot--target        { border-color: #2a4a2a; border-style: dashed; }
-.ls-slot--filled        { border-color: #1a1a2e; }
-.ls-slot--filled:hover  { border-color: #3a3a6a; }
+.ls-slot:hover          { border-color: #333; }
+.ls-slot--target        { border-color: #444; border-style: dashed; }
+.ls-slot--filled        { border-color: #2a2a2a; }
+.ls-slot--filled:hover  { border-color: #444; }
 
 .ls-slot-num {
   font-family: 'VT323', monospace;
@@ -206,8 +194,8 @@
   flex-wrap: wrap;
   gap: 3px;
   flex-shrink: 0;
-  border: 1px solid #0a0a14;
-  background: rgba(2,2,8,0.5);
+  border: 1px solid #1a1a1a;
+  background: #040404;
   padding: 3px;
 }
 
@@ -215,11 +203,8 @@
   /* 5 per row */
   flex: 0 0 calc(20% - 3px);
   height: 46px;
-  border: 1px solid #12121e;
-  background: linear-gradient(to right,
-    #0a0018 0%, #040020 17%, #001016 35%,
-    #000e00 52%, #100600 72%, #100000 100%
-  );
+  border: 1px solid #1c1c1c;
+  background: #060606;
   cursor: grab;
   display: flex;
   flex-direction: column;
@@ -232,12 +217,12 @@
   box-sizing: border-box;
 }
 
-.ls-frag:hover  { border-color: #2a2a4a; }
+.ls-frag:hover  { border-color: #333; }
 .ls-frag:active { cursor: grabbing; }
 
 .ls-frag--selected {
-  border-color: #4a6aaa !important;
-  box-shadow: 0 0 8px rgba(80,120,220,0.25);
+  border-color: #666 !important;
+  box-shadow: 0 0 6px rgba(255,255,255,0.12);
 }
 
 /* SUB label on subtractive fragments */
