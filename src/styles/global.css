@@ -229,7 +229,7 @@ html, body {
   font-size: 0.70rem;
   letter-spacing: 0.1em;
   padding: 3px 9px;
-  cursor: pointer;
+  cursor: pointer; --cursor-hot: 1;
   opacity: 0.5;
   transition: opacity 0.15s, background 0.15s;
   border-radius: 2px;

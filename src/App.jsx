@@ -30,7 +30,6 @@ function App() {
     document.body.appendChild(ring)
 
     const HALF = 3.5
-    const INTERACTIVE = 'button, a, input, select, textarea, label, [role="button"]'
     let mouseX = -20, mouseY = -20
     let rafId
 
@@ -43,9 +42,11 @@ function App() {
         ring.style.left = mouseX + 'px'
         ring.style.top  = mouseY + 'px'
 
-        // Show ring only when over an interactive element
+        // Show ring when over any element that declared --cursor-hot: 1 in CSS.
+        // CSS custom props inherit, so children of interactive containers also match.
+        // This covers all interactive divs across every module without touching JSX.
         const el = document.elementFromPoint(mouseX, mouseY)
-        const hot = !!(el && el.closest(INTERACTIVE))
+        const hot = !!(el && getComputedStyle(el).getPropertyValue('--cursor-hot').trim() === '1')
         ring.classList.toggle('cursor-ring--active', hot)
       } catch (_) { /* never let an error kill the loop */ }
 

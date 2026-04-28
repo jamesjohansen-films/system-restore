@@ -274,7 +274,7 @@
 
 /* Accessible + unrestored → clickable */
 .mct-module-row--accessible {
-  cursor: pointer;
+  cursor: pointer; --cursor-hot: 1;
   border-color: #1e1e1e;
 }
 .mct-module-row--accessible:hover {

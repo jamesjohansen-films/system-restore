@@ -103,7 +103,7 @@
   font-size: 0.78rem;
   letter-spacing: 0.12em;
   padding: 4px 14px;
-  cursor: pointer;
+  cursor: pointer; --cursor-hot: 1;
   transition: all 0.2s;
   margin-top: 4px;
 }
@@ -202,7 +202,7 @@
   letter-spacing: 0.04em;
   padding: 2px 4px;
   width: 100%;
-  cursor: pointer;
+  cursor: pointer; --cursor-hot: 1;
   outline: none;
   appearance: none;
   -webkit-appearance: none;
@@ -240,7 +240,7 @@
 .mc-btn--ready {
   border-color: #2a4a88;
   color: #4a6a9a;
-  cursor: pointer;
+  cursor: pointer; --cursor-hot: 1;
 }
 
 .mc-btn--ready:hover {
@@ -423,7 +423,7 @@
   font-size: 0.85rem;
   letter-spacing: 0.14em;
   padding: 5px 14px;
-  cursor: pointer;
+  cursor: pointer; --cursor-hot: 1;
   align-self: flex-start;
   transition: background 0.2s, border-color 0.2s;
 }

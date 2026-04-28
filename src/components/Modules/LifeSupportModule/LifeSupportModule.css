@@ -145,7 +145,7 @@
   border: 1px solid #1a1a1a;
   background: #000;
   position: relative;     /* slot-num overlays absolutely */
-  cursor: pointer;
+  cursor: pointer; --cursor-hot: 1;
   transition: border-color 0.15s;
   overflow: hidden;
   box-sizing: border-box;
@@ -263,7 +263,7 @@
 .ls-submit--ready {
   border-color: #2a5a2a;
   color: #4a8a4a;
-  cursor: pointer;
+  cursor: pointer; --cursor-hot: 1;
 }
 
 .ls-submit--ready:hover {
@@ -340,7 +340,7 @@
   font-size: 0.78rem;
   letter-spacing: 0.12em;
   padding: 3px 10px;
-  cursor: pointer;
+  cursor: pointer; --cursor-hot: 1;
   align-self: flex-start;
   transition: background 0.2s, border-color 0.2s;
 }
