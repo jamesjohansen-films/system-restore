@@ -223,7 +223,7 @@ function MainCRT({ stage, modules, onStageChange, onModuleRestore }) {
                     onClick={() => accessible && !restored && setView(mod.id)}
                   >
                     <span className="mct-module-label terminal-text">[{mod.label}]</span>
-                    <span className="mct-module-name  terminal-text">{mod.name}</span>
+                    <span className={`mct-module-name terminal-text${accessible && !restored ? ' terminal-cursor' : ''}`}>{mod.name}</span>
                     <span className="mct-module-status terminal-text">
                       {restored   ? '✓ ONLINE'   : accessible ? '— OFFLINE' : '⊘ LOCKED'}
                     </span>
