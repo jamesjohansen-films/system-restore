@@ -35,28 +35,31 @@
   z-index: 1000000;
 }
 
-/* Ring that follows cursor over interactive elements */
+/* Ring that ripples outward from the cursor dot over interactive elements */
+@keyframes cursor-ring-expand {
+  0%   { transform: scale(0.35); opacity: 0.85; }
+  100% { transform: scale(2.4);  opacity: 0;    }
+}
+
 .cursor-ring {
   position: fixed;
   top: 0;
   left: 0;
-  width: 18px;
-  height: 18px;
-  margin-left: -9px;
-  margin-top: -9px;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  margin-top: -10px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   pointer-events: none;
-  opacity: 0;
   z-index: 1000001;
-  /* Fade out slowly when leaving an interactive element */
-  transition: opacity 0.35s ease;
+  /* Animation runs when --active, pauses (at t=0, effectively hidden) otherwise */
+  animation: cursor-ring-expand 0.65s ease-out infinite;
+  animation-play-state: paused;
 }
 
 .cursor-ring--active {
-  opacity: 1;
-  /* Snap in quickly when entering */
-  transition: opacity 0.08s ease;
+  animation-play-state: running;
 }
 
 :root {
