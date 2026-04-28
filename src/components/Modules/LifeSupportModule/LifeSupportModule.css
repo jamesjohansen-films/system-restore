@@ -121,11 +121,20 @@
   letter-spacing: 0.1em;
 }
 
-.ls-spec-chart {
-  border: 1px solid #0f1a0f;
-  background: rgba(0,4,0,0.28);
-  padding: 2px;
-  height: 52px;
+/* Atmospheric dark strip — the SVG sits on top */
+.ls-spec-wrap {
+  border: 1px solid #0a0a18;
+  height: 54px;
+  overflow: hidden;
+  /* Very faint spectrum atmosphere (violet → red) */
+  background: linear-gradient(to right,
+    #0e0020 0%,
+    #060030 17%,
+    #001820 35%,
+    #001400 52%,
+    #1a0800 72%,
+    #180000 100%
+  );
 }
 
 .ls-spec-divider {
@@ -143,23 +152,26 @@
 
 .ls-slot {
   flex: 1;
-  height: 46px;
-  border: 1px solid #1a2a1a;
-  background: rgba(0,4,0,0.22);
+  height: 50px;
+  border: 1px solid #12121e;
+  background: linear-gradient(to right,
+    #0a0018 0%, #040020 17%, #001016 35%,
+    #000e00 52%, #100600 72%, #100000 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s;
   overflow: hidden;
-  padding: 2px;
+  padding: 0;
   min-width: 0;
 }
 
-.ls-slot:hover          { border-color: #2a4a2a; }
-.ls-slot--target        { border-color: #2a6a2a; border-style: dashed; background: rgba(10,40,10,0.22); }
-.ls-slot--filled        { border-color: #1e3a1e; }
-.ls-slot--filled:hover  { border-color: #3a6a3a; }
+.ls-slot:hover          { border-color: #2a2a4a; }
+.ls-slot--target        { border-color: #2a4a2a; border-style: dashed; }
+.ls-slot--filled        { border-color: #1a1a2e; }
+.ls-slot--filled:hover  { border-color: #3a3a6a; }
 
 .ls-slot-num {
   font-family: 'VT323', monospace;
@@ -175,6 +187,8 @@
   flex-direction: column;
   align-items: stretch;
   position: relative;
+  /* Brighten slightly when placed to indicate selection */
+  filter: brightness(1.15);
 }
 
 .ls-slot-frag:hover { opacity: 0.75; }
@@ -192,36 +206,38 @@
   flex-wrap: wrap;
   gap: 3px;
   flex-shrink: 0;
-  border: 1px solid #0f1a0f;
-  background: rgba(0,4,0,0.1);
+  border: 1px solid #0a0a14;
+  background: rgba(2,2,8,0.5);
   padding: 3px;
 }
 
 .ls-frag {
-  /* 5 per row: (100% - 4 gaps × 3px) / 5 */
+  /* 5 per row */
   flex: 0 0 calc(20% - 3px);
-  height: 42px;
-  border: 1px solid #1a2a1a;
-  background: rgba(0,4,0,0.3);
+  height: 46px;
+  border: 1px solid #12121e;
+  background: linear-gradient(to right,
+    #0a0018 0%, #040020 17%, #001016 35%,
+    #000e00 52%, #100600 72%, #100000 100%
+  );
   cursor: grab;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  padding: 2px;
+  padding: 0;
   position: relative;
-  transition: border-color 0.12s, background 0.12s;
+  transition: border-color 0.12s;
   overflow: hidden;
   min-width: 0;
   box-sizing: border-box;
 }
 
-.ls-frag:hover  { border-color: #2a5a2a; background: rgba(0,12,0,0.45); }
+.ls-frag:hover  { border-color: #2a2a4a; }
 .ls-frag:active { cursor: grabbing; }
 
 .ls-frag--selected {
-  border-color: #4aaa4a !important;
-  background: rgba(10,45,10,0.55) !important;
-  box-shadow: 0 0 7px rgba(50,160,50,0.3);
+  border-color: #4a6aaa !important;
+  box-shadow: 0 0 8px rgba(80,120,220,0.25);
 }
 
 /* SUB label on subtractive fragments */

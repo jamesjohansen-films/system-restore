@@ -4,7 +4,13 @@ import './LifeSupportModule.css'
 // ── Constants ──────────────────────────────────────────────────────────────────
 const NUM_COLS  = 6
 const MAX_VAL   = 5
-const COL_COLORS = ['#5566dd','#0099cc','#00aa66','#99aa00','#cc7700','#cc2200']
+
+// Wavelength channel colours (violet → red) and their x-positions
+// in a 200-unit viewBox, evenly distributed
+const CHAN_CLR = ['#9944ff','#4488ff','#00ccdd','#22cc55','#ffaa00','#ff3322']
+const CHAN_X   = [18, 51, 84, 116, 149, 182]
+// Same positions scaled to a 60-unit mini viewBox for fragment tiles
+const CHAN_XF  = CHAN_X.map(x => Math.round((x / 200) * 60))
 
 // ── Puzzle data ────────────────────────────────────────────────────────────────
 // Math verified: summing correct bars equals target exactly.
@@ -85,70 +91,75 @@ function computeResult(placements, frags) {
   return result
 }
 
-// ── Fragment mini-chart (positive bars up, negative bars down from midline) ────
-function FragChart({ bars }) {
-  const vw = NUM_COLS * 10
-  const vh = 28
-  const mid = 14
-  const scale = 12 / MAX_VAL
+// ── Spectral line strip — the core visual ─────────────────────────────────────
+// Renders vertical glowing lines at wavelength positions.
+// `compareTarget` supplied → result mode (colour = match status).
+function SpecStrip({ values, compareTarget = null }) {
+  const vw = 200, vh = 50
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
-      <line x1="0" y1={mid} x2={vw} y2={mid} stroke="#1a2a1a" strokeWidth="0.8"/>
-      {bars.map((v, i) => {
-        const x = i * 10 + 1
-        const bw = 8
-        if (v > 0) {
-          const h = v * scale
-          return <rect key={i} x={x} y={mid - h} width={bw} height={h}
-            fill={COL_COLORS[i]} opacity="0.88"/>
+      {values.map((v, i) => {
+        const x   = CHAN_X[i]
+        const clamp = Math.max(0, Math.min(v, MAX_VAL))
+        const op    = clamp / MAX_VAL
+
+        // Decide line colour
+        let clr = CHAN_CLR[i]
+        if (compareTarget) {
+          if      (v === compareTarget[i]) clr = CHAN_CLR[i]
+          else if (v  >  compareTarget[i]) clr = '#ff4422'
+          else                              clr = '#334dcc'
         }
-        if (v < 0) {
-          const h = (-v) * scale
-          return <rect key={i} x={x} y={mid} width={bw} height={h}
-            fill="#c1121f" opacity="0.85"/>
-        }
-        return null
+
+        return (
+          <g key={i}>
+            {/* Outer soft glow */}
+            {op > 0 && (
+              <rect x={x - 6} y={0} width={13} height={vh}
+                fill={clr} opacity={op * 0.15}/>
+            )}
+            {/* Mid glow */}
+            {op > 0 && (
+              <rect x={x - 2} y={0} width={5} height={vh}
+                fill={clr} opacity={op * 0.42}/>
+            )}
+            {/* Core line */}
+            <rect x={x - 1} y={0} width={2} height={vh}
+              fill={clr} opacity={Math.max(op > 0 ? 0.08 : 0, op * 0.95)}/>
+
+            {/* Ghost: show where target is when current is too dim */}
+            {compareTarget && compareTarget[i] > 0 && v < compareTarget[i] && (
+              <rect x={x - 1} y={0} width={2} height={vh}
+                fill={CHAN_CLR[i]} opacity={(compareTarget[i] / MAX_VAL) * 0.18}
+                strokeDasharray="5 4"
+                stroke={CHAN_CLR[i]} strokeOpacity="0.25" strokeWidth="1"/>
+            )}
+          </g>
+        )
       })}
     </svg>
   )
 }
 
-// ── Main spectrum chart (target or live result) ────────────────────────────────
-function SpecChart({ bars, target }) {
-  const vw = NUM_COLS * 20
-  const vh = 48
-  const base = vh - 2
-  const scale = (vh - 8) / MAX_VAL
+// ── Fragment mini strip ────────────────────────────────────────────────────────
+// Positive contributions = wavelength colour. Negative = red.
+function FragStrip({ bars }) {
+  const vw = 60, vh = 38
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
-      {/* Column tints */}
-      {COL_COLORS.map((c, i) => (
-        <rect key={i} x={i * 20} y={0} width={20} height={vh} fill={c} opacity="0.04"/>
-      ))}
-      {/* Target dashed reference lines (on result chart only) */}
-      {target && target.map((t, i) => {
-        if (t === 0) return null
-        const ty = base - t * scale
+      {bars.map((v, i) => {
+        if (v === 0) return null
+        const x   = CHAN_XF[i]
+        const neg = v < 0
+        const op  = Math.abs(v) / MAX_VAL
+        const clr = neg ? '#dd2211' : CHAN_CLR[i]
         return (
-          <line key={i}
-            x1={i * 20 + 1} y1={ty} x2={i * 20 + 19} y2={ty}
-            stroke={COL_COLORS[i]} strokeWidth="1.2" strokeDasharray="3,2" opacity="0.55"/>
+          <g key={i}>
+            <rect x={x - 4} y={0} width={9}  height={vh} fill={clr} opacity={op * 0.18}/>
+            <rect x={x - 1} y={0} width={3}  height={vh} fill={clr} opacity={Math.max(0.12, op * 0.88)}/>
+          </g>
         )
       })}
-      {/* Bars */}
-      {bars.map((v, i) => {
-        const clamped = Math.max(0, Math.min(v, MAX_VAL + 1))
-        const barH = Math.max(1, clamped * scale)
-        let fill = COL_COLORS[i], op = 0.75
-        if (target) {
-          if      (v === target[i]) { fill = COL_COLORS[i]; op = 0.92 }
-          else if (v  >  target[i]) { fill = '#c1121f';     op = 0.85 }
-          else                       { fill = '#334499';     op = 0.75 }
-        }
-        return <rect key={i} x={i * 20 + 2} y={base - barH} width={16} height={barH}
-          fill={fill} opacity={op}/>
-      })}
-      <line x1="0" y1={base} x2={vw} y2={base} stroke="#1a2a1a" strokeWidth="0.8"/>
     </svg>
   )
 }
@@ -304,16 +315,16 @@ export default function LifeSupportModule({ onSolve, onBack }) {
           {/* Side-by-side spectra */}
           <div className="ls-spectra-row">
             <div className="ls-spectrum-panel">
-              <div className="ls-spec-label terminal-text terminal-text--dim">TARGET</div>
-              <div className="ls-spec-chart">
-                <SpecChart bars={round.target} target={null}/>
+              <div className="ls-spec-label terminal-text terminal-text--dim">TARGET SIGNATURE</div>
+              <div className="ls-spec-wrap">
+                <SpecStrip values={round.target}/>
               </div>
             </div>
             <div className="ls-spec-divider"/>
             <div className="ls-spectrum-panel">
-              <div className="ls-spec-label terminal-text terminal-text--dim">CURRENT</div>
-              <div className="ls-spec-chart">
-                <SpecChart bars={result} target={round.target}/>
+              <div className="ls-spec-label terminal-text terminal-text--dim">CURRENT RESULT</div>
+              <div className="ls-spec-wrap">
+                <SpecStrip values={result} compareTarget={round.target}/>
               </div>
             </div>
           </div>
@@ -337,7 +348,7 @@ export default function LifeSupportModule({ onSolve, onBack }) {
                         draggable
                         onDragStart={e => { e.stopPropagation(); onDragStart(e, f.id, si) }}
                         onClick={e => { e.stopPropagation(); clickSlot(si) }}>
-                        <FragChart bars={f.bars}/>
+                        <FragStrip bars={f.bars}/>
                         {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
                       </div>
                     : <span className="ls-slot-num terminal-text terminal-text--dim">{si + 1}</span>
@@ -360,7 +371,7 @@ export default function LifeSupportModule({ onSolve, onBack }) {
                   draggable
                   onDragStart={e => onDragStart(e, f.id)}
                   onClick={() => setSelected(null)}>
-                  <FragChart bars={f.bars}/>
+                  <FragStrip bars={f.bars}/>
                   {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
                 </div>
               )
@@ -370,7 +381,7 @@ export default function LifeSupportModule({ onSolve, onBack }) {
                 draggable
                 onDragStart={e => onDragStart(e, f.id)}
                 onClick={() => clickFrag(f.id)}>
-                <FragChart bars={f.bars}/>
+                <FragStrip bars={f.bars}/>
                 {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
               </div>
             ))}
