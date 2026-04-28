@@ -19,6 +19,7 @@ const ROUND_DATA = [
     id: 1, label: 'COMPOUND IDENTIFICATION',
     target:     [2, 4, 1, 3, 0, 2],
     slotsCount: 2,
+    bankCount:  4,   // 2 correct + 2 decoys
     fragments: [
       { id:'r1-a', bars:[ 1, 2, 1, 2, 0, 1] },  // ✓ correct
       { id:'r1-b', bars:[ 1, 2, 0, 1, 0, 1] },  // ✓ correct
@@ -36,6 +37,7 @@ const ROUND_DATA = [
     id: 2, label: 'CATALYST TRACE',
     target:     [3, 1, 4, 0, 2, 3],
     slotsCount: 4,
+    bankCount:  6,   // 4 correct + 2 decoys
     fragments: [
       { id:'r2-a', bars:[ 2, 0, 2, 0, 1, 2] },  // ✓
       { id:'r2-b', bars:[ 1, 0, 1, 0, 1, 1] },  // ✓
@@ -53,6 +55,7 @@ const ROUND_DATA = [
     id: 3, label: 'MUTATION MARKER',
     target:     [2, 3, 1, 4, 2, 3],
     slotsCount: 6,
+    bankCount: 10,   // 6 correct + 4 decoys (all fragments shown)
     fragments: [
       { id:'r3-a', bars:[ 1, 1, 1, 2, 1, 1] },  // ✓
       { id:'r3-b', bars:[ 1, 1, 0, 1, 1, 1] },  // ✓
@@ -144,7 +147,15 @@ function FragStrip({ bars }) {
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function LifeSupportModule({ onSolve, onBack }) {
   const [rounds]  = useState(() =>
-    ROUND_DATA.map(r => ({ ...r, fragments: shuffle([...r.fragments]) }))
+    ROUND_DATA.map(r => {
+      // Correct fragments are always the first `slotsCount` entries.
+      // Shuffle the decoys, take only enough to reach bankCount, then
+      // shuffle the whole visible set so correct ones aren't always first.
+      const correct = r.fragments.slice(0, r.slotsCount)
+      const decoys  = shuffle(r.fragments.slice(r.slotsCount))
+                        .slice(0, r.bankCount - r.slotsCount)
+      return { ...r, fragments: shuffle([...correct, ...decoys]) }
+    })
   )
   const [roundIdx,    setRoundIdx]    = useState(0)
   const [placements,  setPlacements]  = useState(Array(ROUND_DATA[0].slotsCount).fill(null))
