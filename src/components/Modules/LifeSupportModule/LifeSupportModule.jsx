@@ -285,21 +285,16 @@ export default function LifeSupportModule({ onSolve, onBack }) {
       {!solved && !roundWin && (
         <div className="ls-body">
 
-          {/* Side-by-side spectra */}
-          <div className="ls-spectra-row">
-            <div className="ls-spectrum-panel">
-              <div className="ls-spec-label terminal-text terminal-text--dim">TARGET SIGNATURE</div>
-              <div className="ls-spec-wrap">
-                <SpecStrip values={round.target}/>
-              </div>
-            </div>
-            <div className="ls-spec-divider"/>
-            <div className="ls-spectrum-panel">
-              <div className="ls-spec-label terminal-text terminal-text--dim">CURRENT RESULT</div>
-              <div className="ls-spec-wrap">
-                <SpecStrip values={result} compareTarget={round.target}/>
-              </div>
-            </div>
+          {/* Target strip */}
+          <div className="ls-spec-label terminal-text terminal-text--dim">// TARGET SIGNATURE</div>
+          <div className="ls-spec-wrap ls-spec-wrap--target">
+            <SpecStrip values={round.target}/>
+          </div>
+
+          {/* Answer strip — fills in as fragments are placed */}
+          <div className="ls-spec-label terminal-text terminal-text--dim">// CURRENT READING</div>
+          <div className="ls-spec-wrap ls-spec-wrap--answer">
+            <SpecStrip values={result} compareTarget={round.target}/>
           </div>
 
           {/* Slots */}

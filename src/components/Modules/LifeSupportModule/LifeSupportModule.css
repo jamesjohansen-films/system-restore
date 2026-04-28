@@ -100,38 +100,35 @@
   flex-shrink: 0;
 }
 
-/* ── Spectra side by side ── */
-.ls-spectra-row {
-  display: flex;
-  gap: 8px;
-  align-items: stretch;
-  flex-shrink: 0;
-}
-
-.ls-spectrum-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
+/* ── Spectrum strips (stacked: target on top, answer below) ── */
 .ls-spec-label {
   font-size: 0.60rem;
   letter-spacing: 0.1em;
 }
 
 .ls-spec-wrap {
-  border: 1px solid #1e1e1e;
+  border: 1px solid #2a2a2a;
   height: 54px;
   overflow: hidden;
-  background: #000;
+  flex-shrink: 0;
+  /* Rainbow spectrum gradient — dark, desaturated, sci-fi palette */
+  background: linear-gradient(to right,
+    #1a0033 0%,
+    #000e66 17%,
+    #003344 33%,
+    #004422 50%,
+    #334400 67%,
+    #442200 83%,
+    #330000 100%
+  );
 }
 
-.ls-spec-divider {
-  width: 1px;
-  background: #0f1a0f;
-  flex-shrink: 0;
+.ls-spec-wrap--target {
+  margin-bottom: 2px;
+}
+
+.ls-spec-wrap--answer {
+  border-color: #1a2a1a;
 }
 
 /* ── Slot targets ── */
