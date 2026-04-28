@@ -122,10 +122,10 @@
 }
 
 .ls-spec-wrap {
-  border: 1px solid #1c1c1c;
+  border: 1px solid #1e1e1e;
   height: 54px;
   overflow: hidden;
-  background: #060606;
+  background: #000;
 }
 
 .ls-spec-divider {
@@ -144,8 +144,8 @@
 .ls-slot {
   flex: 1;
   height: 50px;
-  border: 1px solid #1c1c1c;
-  background: #060606;
+  border: 1px solid #222;
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,10 +156,10 @@
   min-width: 0;
 }
 
-.ls-slot:hover          { border-color: #333; }
-.ls-slot--target        { border-color: #444; border-style: dashed; }
-.ls-slot--filled        { border-color: #2a2a2a; }
-.ls-slot--filled:hover  { border-color: #444; }
+.ls-slot:hover          { border-color: #444; }
+.ls-slot--target        { border-color: #555; border-style: dashed; }
+.ls-slot--filled        { border-color: #333; }
+.ls-slot--filled:hover  { border-color: #555; }
 
 .ls-slot-num {
   font-family: 'VT323', monospace;
@@ -175,8 +175,6 @@
   flex-direction: column;
   align-items: stretch;
   position: relative;
-  /* Brighten slightly when placed to indicate selection */
-  filter: brightness(1.15);
 }
 
 .ls-slot-frag:hover { opacity: 0.75; }
@@ -195,7 +193,7 @@
   gap: 3px;
   flex-shrink: 0;
   border: 1px solid #1a1a1a;
-  background: #040404;
+  background: #080808;
   padding: 3px;
 }
 
@@ -203,8 +201,8 @@
   /* 5 per row */
   flex: 0 0 calc(20% - 3px);
   height: 46px;
-  border: 1px solid #1c1c1c;
-  background: #060606;
+  border: 1px solid #222;
+  background: #000;
   cursor: grab;
   display: flex;
   flex-direction: column;
@@ -217,12 +215,11 @@
   box-sizing: border-box;
 }
 
-.ls-frag:hover  { border-color: #333; }
+.ls-frag:hover  { border-color: #444; }
 .ls-frag:active { cursor: grabbing; }
 
 .ls-frag--selected {
-  border-color: #666 !important;
-  box-shadow: 0 0 6px rgba(255,255,255,0.12);
+  border-color: #888 !important;
 }
 
 /* SUB label on subtractive fragments */

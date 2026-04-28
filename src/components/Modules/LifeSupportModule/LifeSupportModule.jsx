@@ -5,9 +5,9 @@ import './LifeSupportModule.css'
 const NUM_COLS = 6
 const MAX_VAL  = 5
 
-// Channel x-positions in the main 200-unit viewBox and the 60-unit frag viewBox
+// Channel x-positions: main strip (200-unit vbox) and fragment tile (60-unit vbox)
 const CHAN_X  = [22, 54, 86, 118, 150, 182]
-const CHAN_XF = CHAN_X.map(x => Math.round((x / 200) * 60))
+const CHAN_XF = [5,  15,  25,  35,  45,  55]
 
 // ── Puzzle data ────────────────────────────────────────────────────────────────
 // Math verified: summing correct bars equals target exactly.
@@ -89,50 +89,21 @@ function computeResult(placements, frags) {
 }
 
 // ── Spectral line strip ────────────────────────────────────────────────────────
-// Target mode  (compareTarget = null): white lines at target intensity.
-// Result mode  (compareTarget set):    white = matched, red = wrong.
+// Target mode (compareTarget null) : white bar wherever target value > 0.
+// Result mode (compareTarget set)  : white ONLY where current === target AND > 0.
+//                                    Everything else stays black. No gradients.
 function SpecStrip({ values, compareTarget = null }) {
   const vw = 200, vh = 50
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
-      {/* Faint positional tick marks so the player can see all 6 slots */}
-      {CHAN_X.map(x => (
-        <rect key={`tick-${x}`} x={x - 1} y={0} width={2} height={vh}
-          fill="white" opacity="0.04"/>
-      ))}
-
-      {values.map((v, i) => {
-        const x      = CHAN_X[i]
-        const clamp  = Math.max(0, Math.min(v, MAX_VAL))
-        const op     = clamp / MAX_VAL
-
-        if (op === 0 && !compareTarget) return null // target: skip empty
-        if (op === 0 && compareTarget && compareTarget[i] === 0) return null // result: skip if target also empty
-
-        // Result mode: colour by match status
-        const match = compareTarget ? (v === compareTarget[i]) : true
-        const clr   = match ? '#ffffff' : '#ff3322'
-
-        // If result is 0 but target expects a line → show very faint placeholder
-        if (op === 0 && compareTarget && compareTarget[i] > 0) {
-          return (
-            <rect key={i} x={x - 1} y={0} width={2} height={vh}
-              fill="#ff3322" opacity="0.12"/>
-          )
-        }
-
+      {CHAN_X.map((x, i) => {
+        const isTarget = compareTarget === null
+        const show = isTarget
+          ? values[i] > 0
+          : values[i] === compareTarget[i] && compareTarget[i] > 0
+        if (!show) return null
         return (
-          <g key={i}>
-            {/* Outer glow */}
-            <rect x={x - 7} y={0} width={14} height={vh}
-              fill={clr} opacity={op * 0.1}/>
-            {/* Inner glow */}
-            <rect x={x - 2} y={0} width={5} height={vh}
-              fill={clr} opacity={op * 0.35}/>
-            {/* Core */}
-            <rect x={x - 1} y={0} width={2} height={vh}
-              fill={clr} opacity={Math.max(0.1, op * 0.92)}/>
-          </g>
+          <rect key={i} x={x - 5} y={0} width={10} height={vh} fill="white"/>
         )
       })}
     </svg>
@@ -140,47 +111,27 @@ function SpecStrip({ values, compareTarget = null }) {
 }
 
 // ── Fragment mini strip ────────────────────────────────────────────────────────
-// Additive : white lines (brightness = intensity).
-// Subtractive : hollow red-bordered rectangle + diagonal slash — NOT filled.
+// Additive  : flat white bar.
+// Subtractive: hollow red outline + diagonal slash. No fill. No glow.
 function FragStrip({ bars }) {
   const vw = 60, vh = 38
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
-      {/* Faint positional ticks */}
-      {CHAN_XF.map(x => (
-        <rect key={`t-${x}`} x={x - 1} y={0} width={2} height={vh}
-          fill="white" opacity="0.05"/>
-      ))}
-
       {bars.map((v, i) => {
         if (v === 0) return null
-        const x  = CHAN_XF[i]
-        const op = Math.abs(v) / MAX_VAL
-
+        const x = CHAN_XF[i]
         if (v < 0) {
-          // Subtractive: outlined hollow rect + slash
-          const rx = x - 3, rw = 7, ry = 2, rh = vh - 4
+          const rx = x - 3, ry = 1, rw = 7, rh = vh - 2
           return (
             <g key={i}>
-              {/* Red border outline — no fill */}
               <rect x={rx} y={ry} width={rw} height={rh}
-                fill="none" stroke="#c1121f" strokeWidth="1" opacity="0.85"/>
-              {/* Diagonal slash (bottom-left to top-right) */}
+                fill="none" stroke="#c1121f" strokeWidth="1.2"/>
               <line x1={rx} y1={ry + rh} x2={rx + rw} y2={ry}
-                stroke="#c1121f" strokeWidth="1" opacity="0.85"/>
+                stroke="#c1121f" strokeWidth="1.2"/>
             </g>
           )
         }
-
-        // Additive: white line
-        return (
-          <g key={i}>
-            <rect x={x - 4} y={0} width={9} height={vh}
-              fill="white" opacity={op * 0.1}/>
-            <rect x={x - 1} y={0} width={2} height={vh}
-              fill="white" opacity={Math.max(0.15, op * 0.82)}/>
-          </g>
-        )
+        return <rect key={i} x={x - 3} y={0} width={7} height={vh} fill="white"/>
       })}
     </svg>
   )
