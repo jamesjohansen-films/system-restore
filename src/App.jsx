@@ -31,6 +31,7 @@ function App() {
 
     const HALF = 3.5
     let mouseX = -20, mouseY = -20
+    let wasHot = false
     let rafId
 
     function tick() {
@@ -38,16 +39,25 @@ function App() {
         // Move dot
         dot.style.transform = `translate(${mouseX - HALF}px, ${mouseY - HALF}px)`
 
-        // Move ring to same position (follows cursor)
+        // Move ring to cursor position
         ring.style.left = mouseX + 'px'
         ring.style.top  = mouseY + 'px'
 
-        // Show ring when over any element that declared --cursor-hot: 1 in CSS.
-        // CSS custom props inherit, so children of interactive containers also match.
-        // This covers all interactive divs across every module without touching JSX.
-        const el = document.elementFromPoint(mouseX, mouseY)
+        const el  = document.elementFromPoint(mouseX, mouseY)
         const hot = !!(el && getComputedStyle(el).getPropertyValue('--cursor-hot').trim() === '1')
-        ring.classList.toggle('cursor-ring--active', hot)
+
+        if (hot && !wasHot) {
+          // Just entered an interactive element — fire one-shot expand animation.
+          // Reset first so re-entering always restarts from the dot.
+          ring.style.animation = 'none'
+          void ring.offsetWidth                           // force reflow
+          ring.style.animation = 'cursor-ring-expand 0.55s ease-out 1 forwards'
+        } else if (!hot && wasHot) {
+          // Just left — cut animation immediately so ring is invisible.
+          ring.style.animation = 'none'
+        }
+
+        wasHot = hot
       } catch (_) { /* never let an error kill the loop */ }
 
       rafId = requestAnimationFrame(tick)

@@ -35,10 +35,11 @@
   z-index: 1000000;
 }
 
-/* Ring that ripples outward from the cursor dot over interactive elements */
+/* Ring that ripples outward from the cursor dot — triggered via JS */
 @keyframes cursor-ring-expand {
-  0%   { transform: scale(0.35); opacity: 0.85; }
-  100% { transform: scale(2.4);  opacity: 0;    }
+  0%   { transform: scale(0.4); opacity: 0;    }
+  20%  { opacity: 0.65;                        }
+  100% { transform: scale(1.5); opacity: 0;    }
 }
 
 .cursor-ring {
@@ -52,14 +53,8 @@
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.8);
   pointer-events: none;
+  opacity: 0;         /* always hidden unless animation is running */
   z-index: 1000001;
-  /* Animation runs when --active, pauses (at t=0, effectively hidden) otherwise */
-  animation: cursor-ring-expand 0.65s ease-out infinite;
-  animation-play-state: paused;
-}
-
-.cursor-ring--active {
-  animation-play-state: running;
 }
 
 :root {
