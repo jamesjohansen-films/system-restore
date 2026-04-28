@@ -89,22 +89,24 @@ function computeResult(placements, frags) {
 }
 
 // ── Spectral line strip ────────────────────────────────────────────────────────
-// Target mode (compareTarget null) : white bar wherever target value > 0.
-// Result mode (compareTarget set)  : white ONLY where current === target AND > 0.
-//                                    Everything else stays black. No gradients.
-function SpecStrip({ values, compareTarget = null }) {
+// Single combined strip: result overlaid on target reference.
+//   result[i] === target[i] > 0  →  white  (match)
+//   result[i] ≠ target[i] && result[i] ≠ 0  →  red   (wrong / bad combo)
+//   target[i] > 0 && result[i] === 0  →  very dim white  (target not yet covered)
+//   both 0  →  nothing (black section in rainbow)
+function SpecStrip({ target, result }) {
   const vw = 200, vh = 50
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
       {CHAN_X.map((x, i) => {
-        const isTarget = compareTarget === null
-        const show = isTarget
-          ? values[i] > 0
-          : values[i] === compareTarget[i] && compareTarget[i] > 0
-        if (!show) return null
-        return (
-          <rect key={i} x={x - 5} y={0} width={10} height={vh} fill="white"/>
-        )
+        const matched = result[i] !== 0 && result[i] === target[i]
+        const wrong   = result[i] !== 0 && result[i] !== target[i]
+        const pending = target[i] > 0   && result[i] === 0
+
+        if (matched) return <rect key={i} x={x-5} y={0} width={10} height={vh} fill="white"/>
+        if (wrong)   return <rect key={i} x={x-5} y={0} width={10} height={vh} fill="#c1121f"/>
+        if (pending) return <rect key={i} x={x-5} y={0} width={10} height={vh} fill="rgba(255,255,255,0.1)"/>
+        return null
       })}
     </svg>
   )
@@ -285,16 +287,10 @@ export default function LifeSupportModule({ onSolve, onBack }) {
       {!solved && !roundWin && (
         <div className="ls-body">
 
-          {/* Target strip */}
-          <div className="ls-spec-label terminal-text terminal-text--dim">// TARGET SIGNATURE</div>
-          <div className="ls-spec-wrap ls-spec-wrap--target">
-            <SpecStrip values={round.target}/>
-          </div>
-
-          {/* Answer strip — fills in as fragments are placed */}
-          <div className="ls-spec-label terminal-text terminal-text--dim">// CURRENT READING</div>
-          <div className="ls-spec-wrap ls-spec-wrap--answer">
-            <SpecStrip values={result} compareTarget={round.target}/>
+          {/* Single spectrum strip: result overlaid on target */}
+          <div className="ls-spec-label terminal-text terminal-text--dim">// SPECTRAL ANALYSIS</div>
+          <div className="ls-spec-wrap">
+            <SpecStrip target={round.target} result={result}/>
           </div>
 
           {/* Slots */}
