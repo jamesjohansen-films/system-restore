@@ -216,25 +216,24 @@ html, body {
 
 /* ── Dev skip button — remove before launch ── */
 .dev-skip-btn {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  z-index: 999;
-  background: rgba(255, 80, 0, 0.1);
-  border: 1px dashed rgba(255, 80, 0, 0.4);
-  color: rgba(255, 80, 0, 0.6);
+  /* Sits in normal flex flow — always reachable, never clipped */
+  align-self: flex-end;
+  flex-shrink: 0;
+  background: rgba(255, 80, 0, 0.08);
+  border: 1px dashed rgba(255, 80, 0, 0.35);
+  color: rgba(255, 120, 0, 0.75);
   font-family: 'VT323', monospace;
-  font-size: 0.70rem;
+  font-size: 0.75rem;
   letter-spacing: 0.1em;
-  padding: 3px 9px;
+  padding: 2px 10px;
   cursor: pointer; --cursor-hot: 1;
-  opacity: 0.5;
+  opacity: 0.7;
   transition: opacity 0.15s, background 0.15s;
   border-radius: 2px;
 }
 .dev-skip-btn:hover {
   opacity: 1;
-  background: rgba(255, 80, 0, 0.2);
+  background: rgba(255, 80, 0, 0.18);
 }
 
 @keyframes panel-online {
