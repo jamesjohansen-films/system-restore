@@ -105,7 +105,8 @@ export default function CommsModule({ onSolve, onBack }) {
               const sl     = sliders[i]
               const locked = lockedFlags[i]
               const tgtPts = makeWave(ch.target.freq, ch.target.amp)
-              const curPts = makeWave(sl.freq, sl.amp)
+              // Snap to exact target when locked so the two lines perfectly overlap
+              const curPts = locked ? tgtPts : makeWave(sl.freq, sl.amp)
 
               return (
                 <div
