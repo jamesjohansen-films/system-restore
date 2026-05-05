@@ -1,28 +1,20 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import './LifeSupportModule.css'
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 const NUM_COLS = 6
-const MAX_VAL  = 5
-
-// Channel x-positions in the shared 200-unit viewBox
-// Used by BOTH SpecStrip and FragStrip so bars align at the same horizontal positions
-const CHAN_X = [22, 54, 86, 118, 150, 182]
+const CHAN_X   = [22, 54, 86, 118, 150, 182]   // shared 200-unit viewBox x positions
 
 // ── Puzzle data ────────────────────────────────────────────────────────────────
-// Math verified: summing correct bars equals target exactly.
-// r1-a + r1-b = [2,4,1,3,0,2] ✓
-// r2-a+b+c+d  = [3,1,4,0,2,3] ✓  (d is subtractive)
-// r3-a…f      = [2,3,1,4,2,3] ✓  (d,f subtractive)
 const ROUND_DATA = [
   {
     id: 1, label: 'COMPOUND IDENTIFICATION',
     target:     [2, 4, 1, 3, 0, 2],
     slotsCount: 2,
-    bankCount:  4,   // 2 correct + 2 decoys
+    bankCount:  4,
     fragments: [
-      { id:'r1-a', bars:[ 1, 2, 1, 2, 0, 1] },  // ✓ correct
-      { id:'r1-b', bars:[ 1, 2, 0, 1, 0, 1] },  // ✓ correct
+      { id:'r1-a', bars:[ 1, 2, 1, 2, 0, 1] },  // ✓
+      { id:'r1-b', bars:[ 1, 2, 0, 1, 0, 1] },  // ✓
       { id:'r1-c', bars:[ 2, 2, 1, 2, 0, 1] },
       { id:'r1-d', bars:[ 1, 3, 0, 1, 0, 1] },
       { id:'r1-e', bars:[ 1, 2, 0, 2, 0, 2] },
@@ -37,7 +29,7 @@ const ROUND_DATA = [
     id: 2, label: 'CATALYST TRACE',
     target:     [3, 1, 4, 0, 2, 3],
     slotsCount: 4,
-    bankCount:  6,   // 4 correct + 2 decoys
+    bankCount:  6,
     fragments: [
       { id:'r2-a', bars:[ 2, 0, 2, 0, 1, 2] },  // ✓
       { id:'r2-b', bars:[ 1, 0, 1, 0, 1, 1] },  // ✓
@@ -55,7 +47,7 @@ const ROUND_DATA = [
     id: 3, label: 'MUTATION MARKER',
     target:     [2, 3, 1, 4, 2, 3],
     slotsCount: 6,
-    bankCount: 10,   // 6 correct + 4 decoys (all fragments shown)
+    bankCount: 10,
     fragments: [
       { id:'r3-a', bars:[ 1, 1, 1, 2, 1, 1] },  // ✓
       { id:'r3-b', bars:[ 1, 1, 0, 1, 1, 1] },  // ✓
@@ -81,31 +73,27 @@ function shuffle(arr) {
   return a
 }
 
-function computeResult(placements, frags) {
+function computeResult(selectedIds, frags) {
   const result = Array(NUM_COLS).fill(0)
-  placements.forEach(id => {
-    if (!id) return
+  selectedIds.forEach(id => {
     const f = frags.find(x => x.id === id)
     if (f) f.bars.forEach((v, i) => { result[i] += v })
   })
   return result
 }
 
-// ── Spectral line strip ────────────────────────────────────────────────────────
-// Uses <line> + vectorEffect="non-scaling-stroke" so every bar is always
-// the same pixel width regardless of how wide the container is.
-//   matched  → white solid line
-//   wrong    → red solid line
-//   pending  → dim white line (target not yet covered)
+// ── Spectral strip — target + live result overlaid ─────────────────────────────
+//   matched  → white  (result[i] === target[i], both non-zero or target=0 & result=0)
+//   wrong    → red    (result differs from target)
+//   pending  → dim    (target > 0, nothing placed yet)
 function SpecStrip({ target, result }) {
   const vw = 200, vh = 50
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
       {CHAN_X.map((x, i) => {
-        const matched = result[i] !== 0 && result[i] === target[i]
+        const matched = result[i] === target[i] && target[i] !== 0
         const wrong   = result[i] !== 0 && result[i] !== target[i]
-        const pending = target[i] > 0   && result[i] === 0
-
+        const pending = target[i] > 0 && result[i] === 0
         if (matched) return (
           <line key={i} x1={x} y1={0} x2={x} y2={vh}
             stroke="white" strokeWidth="3" vectorEffect="non-scaling-stroke"/>
@@ -124,13 +112,9 @@ function SpecStrip({ target, result }) {
   )
 }
 
-// ── Fragment mini strip ────────────────────────────────────────────────────────
-// Same coordinate system as SpecStrip. vectorEffect keeps bars a fixed
-// pixel width so they look the same in narrow tiles and the wide strip.
-//   additive    → white solid line
-//   subtractive → red dashed line (visually distinct from "wrong")
+// ── Fragment row strip ─────────────────────────────────────────────────────────
 function FragStrip({ bars }) {
-  const vw = 200, vh = 46
+  const vw = 200, vh = 28
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
       {bars.map((v, i) => {
@@ -152,81 +136,39 @@ function FragStrip({ bars }) {
 
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function LifeSupportModule({ onSolve, onBack }) {
-  const [rounds]  = useState(() =>
+  const [rounds] = useState(() =>
     ROUND_DATA.map(r => {
-      // Correct fragments are always the first `slotsCount` entries.
-      // Shuffle the decoys, take only enough to reach bankCount, then
-      // shuffle the whole visible set so correct ones aren't always first.
       const correct = r.fragments.slice(0, r.slotsCount)
       const decoys  = shuffle(r.fragments.slice(r.slotsCount))
                         .slice(0, r.bankCount - r.slotsCount)
       return { ...r, fragments: shuffle([...correct, ...decoys]) }
     })
   )
-  const [roundIdx,    setRoundIdx]    = useState(0)
-  const [placements,  setPlacements]  = useState(Array(ROUND_DATA[0].slotsCount).fill(null))
-  const [selected,    setSelected]    = useState(null)
-  const [error,       setError]       = useState(false)
-  const [roundWin,    setRoundWin]    = useState(false)
-  const [solved,      setSolved]      = useState(false)
-  const [showFrag,    setShowFrag]    = useState(false)
-  const dragRef = useRef(null)
 
-  const round    = rounds[roundIdx]
-  const placedSet = new Set(placements.filter(Boolean))
-  const bankFrags = round.fragments.filter(f => !placedSet.has(f.id) && f.id !== selected)
-  const result    = computeResult(placements, round.fragments)
-  const allFilled = placements.every(p => p !== null)
+  const [roundIdx,   setRoundIdx]   = useState(0)
+  const [selectedIds, setSelectedIds] = useState(() => new Set())
+  const [error,      setError]      = useState(false)
+  const [roundWin,   setRoundWin]   = useState(false)
+  const [solved,     setSolved]     = useState(false)
+  const [showFrag,   setShowFrag]   = useState(false)
+
+  const round     = rounds[roundIdx]
+  const result    = computeResult(selectedIds, round.fragments)
+  const allFilled = selectedIds.size === round.slotsCount
   const isMatch   = allFilled && result.every((v, i) => v === round.target[i])
 
-  // ── Click: select from bank ──────────────────────────────────────────────
-  function clickFrag(fragId) {
-    setSelected(prev => prev === fragId ? null : fragId)
-  }
-
-  // ── Click: slot ─────────────────────────────────────────────────────────
-  function clickSlot(slotIdx) {
-    if (selected) {
-      setPlacements(prev => {
-        const n = [...prev]
-        const from = n.indexOf(selected)
-        if (from !== -1) n[from] = null
-        n[slotIdx] = selected
-        return n
-      })
-      setSelected(null)
-    } else if (placements[slotIdx]) {
-      setSelected(placements[slotIdx])
-      setPlacements(prev => { const n = [...prev]; n[slotIdx] = null; return n })
-    }
-  }
-
-  // ── Drag ─────────────────────────────────────────────────────────────────
-  function onDragStart(e, fragId, slotIdx = null) {
-    dragRef.current = { fragId, slotIdx }
-    e.dataTransfer.effectAllowed = 'move'
-  }
-  function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move' }
-  function onDropSlot(e, targetIdx) {
-    e.preventDefault()
-    if (!dragRef.current) return
-    const { fragId, slotIdx: src } = dragRef.current
-    setPlacements(prev => {
-      const n = [...prev]
-      if (src !== null) n[src] = null
-      n[targetIdx] = fragId
-      return n
+  // ── Toggle a fragment on/off ──────────────────────────────────────────────
+  function toggleFrag(id) {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else if (next.size < round.slotsCount) {
+        next.add(id)
+      }
+      return next
     })
-    setSelected(null); dragRef.current = null
-  }
-  function onDropBank(e) {
-    e.preventDefault()
-    if (!dragRef.current) return
-    const { fragId, slotIdx: src } = dragRef.current
-    if (src !== null) {
-      setPlacements(prev => { const n = [...prev]; n[src] = null; return n })
-    }
-    setSelected(null); dragRef.current = null
+    setError(false)
   }
 
   // ── Submit ────────────────────────────────────────────────────────────────
@@ -239,8 +181,8 @@ export default function LifeSupportModule({ onSolve, onBack }) {
         const next = roundIdx + 1
         if (next < ROUND_DATA.length) {
           setRoundIdx(next)
-          setPlacements(Array(ROUND_DATA[next].slotsCount).fill(null))
-          setSelected(null); setError(false)
+          setSelectedIds(new Set())
+          setError(false)
         } else {
           setSolved(true)
           setTimeout(() => setShowFrag(true), 800)
@@ -258,16 +200,16 @@ export default function LifeSupportModule({ onSolve, onBack }) {
     const next = roundIdx + 1
     if (next < ROUND_DATA.length) {
       setRoundIdx(next)
-      setPlacements(Array(ROUND_DATA[next].slotsCount).fill(null))
-      setSelected(null); setError(false)
+      setSelectedIds(new Set())
+      setError(false)
     } else {
       setSolved(true)
       setTimeout(() => setShowFrag(true), 300)
     }
   }
 
-  const statusText = solved ? '✓ ANALYSIS COMPLETE'
-    : roundWin ? '✓ PATTERN MATCHED'
+  const statusText = solved   ? '✓ ANALYSIS COMPLETE'
+    : roundWin                ? '✓ PATTERN MATCHED'
     : `SCAN ${roundIdx + 1} / 3`
 
   return (
@@ -306,73 +248,42 @@ export default function LifeSupportModule({ onSolve, onBack }) {
       {!solved && !roundWin && (
         <div className="ls-body">
 
-          {/* Single spectrum strip: result overlaid on target */}
+          {/* Spec strip */}
           <div className="ls-spec-label terminal-text terminal-text--dim">// SPECTRAL ANALYSIS</div>
           <div className="ls-spec-wrap">
             <SpecStrip target={round.target} result={result}/>
           </div>
 
-          {/* Slots — full-width rows so bars align with the strip above */}
+          {/* Fragment list — all stacked, click to select */}
           <div className="ls-section-label terminal-text">
-            ACTIVE SLOTS — {placements.filter(Boolean).length}/{round.slotsCount} PLACED:
+            SELECT {selectedIds.size} / {round.slotsCount} SAMPLES:
           </div>
-          <div className="ls-slots">
-            {placements.map((fragId, si) => {
-              const f = fragId ? round.fragments.find(x => x.id === fragId) : null
+          <div className="ls-frag-list">
+            {round.fragments.map((f, idx) => {
+              const isSelected = selectedIds.has(f.id)
+              const atMax      = selectedIds.size >= round.slotsCount
+              const isSub      = f.bars.some(v => v < 0)
               return (
-                <div key={si}
-                  className={`ls-slot ls-slot--row ${f ? 'ls-slot--filled' : ''} ${selected && !f ? 'ls-slot--target' : ''}`}
-                  onClick={() => clickSlot(si)}
-                  onDragOver={onDragOver}
-                  onDrop={e => onDropSlot(e, si)}
+                <div
+                  key={f.id}
+                  className={`ls-frag-row
+                    ${isSelected ? 'ls-frag-row--selected' : ''}
+                    ${!isSelected && atMax ? 'ls-frag-row--locked' : ''}`}
+                  onClick={() => toggleFrag(f.id)}
                 >
-                  {/* Number is absolute so it doesn't shift the SVG */}
-                  <span className="ls-slot-num terminal-text terminal-text--dim">{si + 1}</span>
-                  {f
-                    ? <div className="ls-slot-frag"
-                        draggable
-                        onDragStart={e => { e.stopPropagation(); onDragStart(e, f.id, si) }}
-                        onClick={e => { e.stopPropagation(); clickSlot(si) }}>
-                        <FragStrip bars={f.bars}/>
-                        {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
-                      </div>
-                    : null
-                  }
+                  <span className="ls-frag-idx terminal-text">{idx + 1}</span>
+                  <div className="ls-frag-inner">
+                    <FragStrip bars={f.bars}/>
+                  </div>
+                  {isSub && <span className="ls-frag-tag">SUB</span>}
+                  {isSelected && <span className="ls-frag-check">✓</span>}
                 </div>
               )
             })}
           </div>
 
-          {/* Bank */}
-          <div className="ls-bank-header terminal-text terminal-text--dim">
-            FRAGMENT BANK — {bankFrags.length + (selected ? 1 : 0)} AVAILABLE:
-          </div>
-          <div className="ls-bank" onDragOver={onDragOver} onDrop={onDropBank}>
-            {selected && (() => {
-              const f = round.fragments.find(x => x.id === selected)
-              return (
-                <div key={f.id} className="ls-frag ls-frag--selected"
-                  draggable
-                  onDragStart={e => onDragStart(e, f.id)}
-                  onClick={() => setSelected(null)}>
-                  <FragStrip bars={f.bars}/>
-                  {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
-                </div>
-              )
-            })()}
-            {bankFrags.map(f => (
-              <div key={f.id} className="ls-frag"
-                draggable
-                onDragStart={e => onDragStart(e, f.id)}
-                onClick={() => clickFrag(f.id)}>
-                <FragStrip bars={f.bars}/>
-                {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
-              </div>
-            ))}
-          </div>
-
           {error && (
-            <div className="ls-error terminal-text">⚠ SPECTRUM MISMATCH — ADJUST FRAGMENT SELECTION</div>
+            <div className="ls-error terminal-text">⚠ SPECTRUM MISMATCH — ADJUST SELECTION</div>
           )}
 
           <button

@@ -100,10 +100,11 @@
   flex-shrink: 0;
 }
 
-/* ── Spectrum strips (stacked: target on top, answer below) ── */
+/* ── Spectrum strip ── */
 .ls-spec-label {
   font-size: 0.60rem;
   letter-spacing: 0.1em;
+  flex-shrink: 0;
 }
 
 .ls-spec-wrap {
@@ -111,7 +112,6 @@
   height: 54px;
   overflow: hidden;
   flex-shrink: 0;
-  /* Rainbow spectrum gradient — dark, desaturated, sci-fi palette */
   background: linear-gradient(to right,
     #1a0033 0%,
     #000e66 17%,
@@ -123,122 +123,101 @@
   );
 }
 
-.ls-spec-wrap--target {
-  margin-bottom: 2px;
-}
-
-.ls-spec-wrap--answer {
-  border-color: #1a2a1a;
-}
-
-/* ── Slot targets — full-width stacked rows ── */
-.ls-slots {
+/* ── Fragment list — stacked full-width rows, all aligned ── */
+.ls-frag-list {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  flex-shrink: 0;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
-.ls-slot--row {
+/* Each fragment row: same width as spec strip so bars align exactly */
+.ls-frag-row {
   width: 100%;
   height: 28px;
+  flex-shrink: 0;
   border: 1px solid #1a1a1a;
   background: #000;
-  position: relative;     /* slot-num overlays absolutely */
+  position: relative;
   cursor: pointer; --cursor-hot: 1;
-  transition: border-color 0.15s;
+  transition: border-color 0.12s, background 0.12s;
   overflow: hidden;
   box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
 }
 
-.ls-slot--row:hover         { border-color: #333; }
-.ls-slot--target            { border-color: #2a3a2a; border-style: dashed; }
-.ls-slot--filled            { border-color: #222; }
-.ls-slot--filled:hover      { border-color: #444; }
+.ls-frag-row:hover {
+  border-color: #2a2a2a;
+  background: #050505;
+}
 
-/* Number overlaid in top-left — does NOT shift the SVG */
-.ls-slot-num {
+/* Selected — green tint border */
+.ls-frag-row--selected {
+  border-color: #2a5a2a;
+  background: #020a02;
+}
+
+.ls-frag-row--selected:hover {
+  border-color: #3a7a3a;
+}
+
+/* At max selection — other rows dim to show they're locked out */
+.ls-frag-row--locked {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Row number — absolute so it doesn't shift the SVG */
+.ls-frag-idx {
   position: absolute;
   left: 3px;
   top: 50%;
   transform: translateY(-50%);
   font-family: 'VT323', monospace;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   color: #1a2a1a;
   z-index: 2;
   pointer-events: none;
   line-height: 1;
 }
 
-/* Frag SVG fills the full slot width from left edge — aligns with strip */
-.ls-slot-frag {
+/* Check mark when selected */
+.ls-frag-check {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'VT323', monospace;
+  font-size: 0.75rem;
+  color: #4a8a4a;
+  z-index: 2;
+  pointer-events: none;
+  line-height: 1;
+}
+
+/* SVG wrapper — fills full row */
+.ls-frag-inner {
   position: absolute;
   inset: 0;
-  cursor: grab;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.ls-slot-frag:hover { opacity: 0.75; }
-.ls-slot-frag:active { cursor: grabbing; }
-
-/* ── Fragment bank ── */
-.ls-bank-header {
-  font-size: 0.60rem;
-  letter-spacing: 0.07em;
-  flex-shrink: 0;
-}
-
-/* Full-width column — matches slot row and spec strip width
-   so bar positions align across all three elements */
-.ls-bank {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex-shrink: 0;
-  border: 1px solid #1a1a1a;
-  background: #080808;
-  padding: 2px;
-  overflow-y: auto;
-  max-height: 120px;   /* ~4 rows; scrolls for round 3's 10 choices */
-}
-
-.ls-frag {
-  width: 100%;
-  flex-shrink: 0;
-  height: 28px;        /* same as slot rows */
-  border: 1px solid #222;
-  background: #000;
-  cursor: grab;
   display: flex;
   align-items: stretch;
-  padding: 0;
-  position: relative;
-  transition: border-color 0.12s;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-
-.ls-frag:hover  { border-color: #444; }
-.ls-frag:active { cursor: grabbing; }
-
-.ls-frag--selected {
-  border-color: #888 !important;
-  background: #0a0a08;
 }
 
 /* SUB label on subtractive fragments */
 .ls-frag-tag {
   position: absolute;
   bottom: 1px;
-  right: 2px;
+  right: 14px;       /* nudged left to clear the check mark */
   font-family: 'VT323', monospace;
   font-size: 0.50rem;
   color: #c1121f;
   letter-spacing: 0;
   line-height: 1;
   pointer-events: none;
+  z-index: 3;
 }
 
 /* ── Error + Submit ── */
