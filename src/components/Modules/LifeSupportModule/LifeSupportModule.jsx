@@ -347,36 +347,29 @@ export default function LifeSupportModule({ onSolve, onBack }) {
           <div className="ls-bank-header terminal-text terminal-text--dim">
             FRAGMENT BANK — {bankFrags.length + (selected ? 1 : 0)} AVAILABLE:
           </div>
-          {(() => {
-            // 2 cols for 4 choices, 3 cols for 6, 5 cols for 10
-            const cols = round.bankCount <= 4 ? 2 : round.bankCount <= 6 ? 3 : 5
-            const fragStyle = { flexBasis: `calc(${100 / cols}% - 3px)` }
-            return (
-              <div className="ls-bank" onDragOver={onDragOver} onDrop={onDropBank}>
-                {selected && (() => {
-                  const f = round.fragments.find(x => x.id === selected)
-                  return (
-                    <div key={f.id} className="ls-frag ls-frag--selected"
-                      style={fragStyle} draggable
-                      onDragStart={e => onDragStart(e, f.id)}
-                      onClick={() => setSelected(null)}>
-                      <FragStrip bars={f.bars}/>
-                      {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
-                    </div>
-                  )
-                })()}
-                {bankFrags.map(f => (
-                  <div key={f.id} className="ls-frag"
-                    style={fragStyle} draggable
-                    onDragStart={e => onDragStart(e, f.id)}
-                    onClick={() => clickFrag(f.id)}>
-                    <FragStrip bars={f.bars}/>
-                    {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
-                  </div>
-                ))}
+          <div className="ls-bank" onDragOver={onDragOver} onDrop={onDropBank}>
+            {selected && (() => {
+              const f = round.fragments.find(x => x.id === selected)
+              return (
+                <div key={f.id} className="ls-frag ls-frag--selected"
+                  draggable
+                  onDragStart={e => onDragStart(e, f.id)}
+                  onClick={() => setSelected(null)}>
+                  <FragStrip bars={f.bars}/>
+                  {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
+                </div>
+              )
+            })()}
+            {bankFrags.map(f => (
+              <div key={f.id} className="ls-frag"
+                draggable
+                onDragStart={e => onDragStart(e, f.id)}
+                onClick={() => clickFrag(f.id)}>
+                <FragStrip bars={f.bars}/>
+                {f.bars.some(v => v < 0) && <span className="ls-frag-tag">SUB</span>}
               </div>
-            )
-          })()}
+            ))}
+          </div>
 
           {error && (
             <div className="ls-error terminal-text">⚠ SPECTRUM MISMATCH — ADJUST FRAGMENT SELECTION</div>
