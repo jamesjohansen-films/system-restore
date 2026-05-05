@@ -14,7 +14,7 @@ function StatusPanel({ module, stage }) {
               <span className="status-panel__value terminal-text">{module.value}</span>
             </>
           ) : hasError ? (
-            <span className="status-panel__error">ERROR</span>
+            <span className="status-panel__error">OFFLINE</span>
           ) : (
             <span className="status-panel__blank">——</span>
           )}

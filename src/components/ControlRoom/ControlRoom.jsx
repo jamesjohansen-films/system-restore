@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './ControlRoom.css'
 import StatusPanel from '../StatusPanel/StatusPanel'
 import MainCRT from '../MainCRT/MainCRT'
 
 function ControlRoom({ stage, modules, onStageChange, onModuleRestore }) {
-  const sceneRef = useRef(null)
+  const sceneRef  = useRef(null)
+  const [focused, setFocused] = useState(false)
 
   useEffect(() => {
     const target  = { x: 0, y: 0 }
@@ -57,7 +58,7 @@ function ControlRoom({ stage, modules, onStageChange, onModuleRestore }) {
       </div>
 
       {/* Main layout */}
-      <div className="control-room__grid">
+      <div className={`control-room__grid${focused ? ' control-room__grid--focused' : ''}`}>
 
         {/* Left panels */}
         <div className="control-room__side control-room__side--left">
@@ -71,6 +72,7 @@ function ControlRoom({ stage, modules, onStageChange, onModuleRestore }) {
           modules={modules}
           onStageChange={onStageChange}
           onModuleRestore={onModuleRestore}
+          onFocusChange={setFocused}
         />
 
         {/* Right panels */}

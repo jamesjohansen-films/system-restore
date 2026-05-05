@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import './MainCRT.css'
 import PowerModule        from '../Modules/PowerModule/PowerModule'
 import CommsModule        from '../Modules/CommsModule/CommsModule'
@@ -27,13 +27,19 @@ const MODULE_LIST = [
 ]
 
 // ── Component ────────────────────────────────────────────────────────────────
-function MainCRT({ stage, modules, onStageChange, onModuleRestore }) {
+function MainCRT({ stage, modules, onStageChange, onModuleRestore, onFocusChange }) {
   // view: 'boot' | 'booting' | 'modules' | 'power'
   const [view, setView]             = useState('boot')
   const [input, setInput]           = useState('')
   const [rejected, setRejected]     = useState(false)
   const [invalid, setInvalid]       = useState(false)
   const [visibleLines, setVisible]  = useState([])
+
+  // ── Tell parent to zoom in whenever a module puzzle is active ────────────
+  useEffect(() => {
+    const isModule = !['boot', 'booting', 'modules'].includes(view)
+    onFocusChange?.(isModule)
+  }, [view])
 
   // ── Typewriter effect after y+Enter ─────────────────────────────────────
   useEffect(() => {

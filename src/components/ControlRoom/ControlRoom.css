@@ -8,6 +8,7 @@
   height: min(100vh, 56.25vw);
   max-width: 1600px;
   max-height: 900px;
+  overflow: hidden;   /* clips side panels when grid zooms in */
 
   display: flex;
   flex-direction: column;
@@ -110,9 +111,15 @@
 
   /* Tilt the whole console surface away from the viewer */
   perspective: 1400px;
-  transform: perspective(1400px) rotateX(4deg);
-  transform-origin: center bottom;
+  transform: perspective(1400px) rotateX(4deg) scale(1);
+  transform-origin: center center;
   transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* When a module puzzle is active: zoom in, flatten tilt, push sides off-screen */
+.control-room__grid--focused {
+  transform: perspective(1400px) rotateX(1deg) scale(1.38);
 }
 
 /* Side columns */
