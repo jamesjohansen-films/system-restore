@@ -4,12 +4,16 @@ import StatusPanel from '../StatusPanel/StatusPanel'
 import MainCRT from '../MainCRT/MainCRT'
 
 function ControlRoom({ stage, modules, onStageChange, onModuleRestore }) {
-  const sceneRef  = useRef(null)
+  const sceneRef    = useRef(null)
+  const focusedRef  = useRef(false)
   const [focused, setFocused] = useState(false)
+
+  // Keep ref in sync so the RAF loop can read it without a stale closure
+  useEffect(() => { focusedRef.current = focused }, [focused])
 
   useEffect(() => {
     const target  = { x: 0, y: 0 }
-    const current = { x: 0, y: 0 }
+    const current = { x: 0, y: 0, scale: 1 }
     let raf
 
     function onMouseMove(e) {
@@ -18,16 +22,22 @@ function ControlRoom({ stage, modules, onStageChange, onModuleRestore }) {
     }
 
     function tick() {
+      const isFocused = focusedRef.current
+
       // Lerp toward target — feels like a heavy camera settling
-      current.x += (target.x - current.x) * 0.08
-      current.y += (target.y - current.y) * 0.08
+      current.x     += (target.x - current.x) * 0.08
+      current.y     += (target.y - current.y) * 0.08
+      // Lerp scale — slightly slower so the zoom feels weighty
+      const targetScale = isFocused ? 1.32 : 1.0
+      current.scale += (targetScale - current.scale) * 0.06
 
       if (sceneRef.current) {
-        // Translate the scene — feels like panning a camera, not tilting
-        const tx = -current.x * 36  // mouse right → scene shifts left  ±36px
-        const ty = -current.y * 20  // mouse down  → scene shifts up    ±20px
+        // Reduce parallax travel when zoomed in so it doesn't feel jittery
+        const panMult = isFocused ? 0.4 : 1.0
+        const tx = -current.x * 36 * panMult
+        const ty = -current.y * 20 * panMult
         sceneRef.current.style.transform =
-          `translateX(${tx.toFixed(2)}px) translateY(${ty.toFixed(2)}px)`
+          `translateX(${tx.toFixed(2)}px) translateY(${ty.toFixed(2)}px) scale(${current.scale.toFixed(4)})`
       }
 
       raf = requestAnimationFrame(tick)
@@ -58,7 +68,7 @@ function ControlRoom({ stage, modules, onStageChange, onModuleRestore }) {
       </div>
 
       {/* Main layout */}
-      <div className={`control-room__grid${focused ? ' control-room__grid--focused' : ''}`}>
+      <div className="control-room__grid">
 
         {/* Left panels */}
         <div className="control-room__side control-room__side--left">
