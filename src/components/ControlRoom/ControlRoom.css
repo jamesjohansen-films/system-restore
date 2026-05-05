@@ -119,9 +119,9 @@
   transition: grid-template-columns 0.55s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* When focused: collapse side columns — CRT takes full width */
+/* When focused: CRT takes ~80%, side panels show just their edges */
 .control-room__grid--focused {
-  grid-template-columns: 0fr 1fr 0fr;
+  grid-template-columns: 1fr 8fr 1fr;
 }
 
 /* Side columns */
@@ -130,13 +130,13 @@
   flex-direction: column;
   gap: 12px;
   min-width: 0;
-  overflow: hidden;          /* required for 0fr collapse to clip panels */
+  overflow: hidden;          /* clips panels to the narrow column width */
   transform-style: preserve-3d;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.45s ease;
 }
 
 .control-room__grid--focused .control-room__side {
-  opacity: 0;
+  opacity: 0.35;
   pointer-events: none;
 }
 
