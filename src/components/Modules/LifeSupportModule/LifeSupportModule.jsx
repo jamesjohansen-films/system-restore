@@ -42,10 +42,10 @@ const ROUND_DATA = [
     slotsCount: 4,
     bankCount:  6,
     fragments: [
-      { id:'r2-a', bars:[ 2, 0, 2, 0, 1, 2] },  // ✓  col3=0
-      { id:'r2-b', bars:[ 1, 0, 1, 0, 1, 1] },  // ✓  col3=0
-      { id:'r2-c', bars:[ 1, 1, 2, 0, 1, 1] },  // ✓  col3=0
-      { id:'r2-d', bars:[-1, 0,-1, 0,-1,-1] },  // ✓  col3=0  (subtractive)
+      { id:'r2-a', bars:[ 1, 0, 2, 0, 1, 1] },  // ✓  col3=0
+      { id:'r2-b', bars:[ 1, 0, 1, 0, 0, 1] },  // ✓  col3=0
+      { id:'r2-c', bars:[ 0, 1, 1, 0, 1, 0] },  // ✓  col3=0
+      { id:'r2-d', bars:[ 1, 0, 0, 0, 0, 1] },  // ✓  col3=0  — all 4 sum to [3,1,4,0,2,3]; no subset of 2-3 matches
       // ── Decoys — all have a bar at col3 (target=0) ──
       { id:'r2-e', bars:[ 2, 0, 3, 3, 1, 2] },  // tall col3 bar
       { id:'r2-f', bars:[ 1, 1, 1, 2, 1, 1] },  // col3

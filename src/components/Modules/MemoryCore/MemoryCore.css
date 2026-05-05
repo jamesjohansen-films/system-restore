@@ -432,3 +432,135 @@
   background: rgba(0, 223, 216, 0.08);
   border-color: rgba(0, 223, 216, 0.5);
 }
+
+/* ── Launch screen ── */
+.mc-body--launch {
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+
+.mc-launch-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  color: #3a4e6a;
+  flex-shrink: 0;
+}
+
+.mc-launch-sub {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+  margin-top: -3px;
+}
+
+/* ── Fragment checklist ── */
+.mc-frag-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.mc-frag-check-row {
+  display: grid;
+  grid-template-columns: 52px 80px 1fr 22px;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid #111820;
+  background: rgba(5, 8, 20, 0.22);
+}
+
+.mc-frag-check-id {
+  font-family: 'VT323', monospace;
+  font-size: 0.72rem;
+  color: #3a4e6a;
+  letter-spacing: 0.1em;
+}
+
+.mc-frag-check-crew {
+  font-family: 'VT323', monospace;
+  font-size: 0.72rem;
+  color: #5a7aaa;
+  letter-spacing: 0.08em;
+}
+
+.mc-frag-check-event {
+  font-size: 0.60rem;
+  letter-spacing: 0.05em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mc-frag-check-ok {
+  font-family: 'VT323', monospace;
+  font-size: 0.80rem;
+  color: #00dfd8;
+  text-shadow: 0 0 6px rgba(0, 223, 216, 0.4);
+  text-align: right;
+}
+
+/* ── Launch zone ── */
+.mc-launch-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+  flex-shrink: 0;
+}
+
+.mc-launch-warning {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: #c1121f !important;
+  opacity: 0.6;
+  text-align: center;
+}
+
+.mc-launch-btn {
+  width: 100%;
+  padding: 10px 8px;
+  background: none;
+  border: 1px solid #1a2030;
+  color: #2a3a5a;
+  font-family: 'VT323', monospace;
+  font-size: 1.0rem;
+  letter-spacing: 0.14em;
+  cursor: not-allowed;
+  transition: all 0.25s;
+}
+
+.mc-launch-btn--ready {
+  border-color: #c1121f;
+  color: #c1121f;
+  cursor: pointer; --cursor-hot: 1;
+  animation: glitch-flicker 4s linear infinite;
+}
+
+.mc-launch-btn--ready:hover {
+  border-color: #e82030;
+  color: #ff3040;
+  background: rgba(193, 18, 31, 0.06);
+  box-shadow: 0 0 16px rgba(193, 18, 31, 0.2);
+  text-shadow: 0 0 8px rgba(193, 18, 31, 0.5);
+  animation: none;
+}
+
+.mc-launch-btn--launching {
+  border-color: #00dfd8;
+  color: #00dfd8;
+  cursor: wait !important;
+  animation: glitch-flicker 0.5s linear infinite;
+  text-shadow: 0 0 8px rgba(0, 223, 216, 0.5);
+}
+
+/* Launching status style */
+.mc-status--launching {
+  color: #00dfd8;
+  animation: glitch-flicker 0.5s linear infinite;
+  text-shadow: 0 0 8px rgba(0, 223, 216, 0.4);
+}

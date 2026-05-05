@@ -129,30 +129,45 @@ function CommsAnim() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Navigation — 3D rotating wireframe spacecraft
+// Fuselage has real cross-section height (T = top, B = bottom).
+// Two-axis tumble: yaw + pitch at irrational ratio → never repeats.
 // ─────────────────────────────────────────────────────────────────────────────
+const _T = 0.22, _B = -0.16, _W = 0.22   // fuselage cross-section constants
 const SHIP_V = [
-  [ 0.00,  0.00, -1.60], // 0 nose
-  [-0.30,  0.00, -0.30], // 1 left-fuse front
-  [ 0.30,  0.00, -0.30], // 2 right-fuse front
-  [-0.30,  0.00,  0.80], // 3 left-fuse rear
-  [ 0.30,  0.00,  0.80], // 4 right-fuse rear
-  [-1.55,  0.06,  0.20], // 5 left-wing tip
-  [ 1.55,  0.06,  0.20], // 6 right-wing tip
-  [-0.40,  0.00,  1.35], // 7 left-engine
-  [ 0.40,  0.00,  1.35], // 8 right-engine
-  [ 0.00,  0.00,  1.10], // 9 tail fin base
-  [ 0.00,  0.14, -1.00], // 10 cockpit front
-  [-0.14,  0.10, -0.20], // 11 cockpit left
-  [ 0.14,  0.10, -0.20], // 12 cockpit right
-  [-0.14,  0.10,  0.50], // 13 cockpit rear-left
-  [ 0.14,  0.10,  0.50], // 14 cockpit rear-right
+  [ 0.00,  0.00, -1.60],   //  0  nose tip
+  [-_W,    _T,   -0.30],   //  1  left-top-front
+  [ _W,    _T,   -0.30],   //  2  right-top-front
+  [-_W,    _B,   -0.30],   //  3  left-bot-front
+  [ _W,    _B,   -0.30],   //  4  right-bot-front
+  [-_W,    _T,    0.80],   //  5  left-top-rear
+  [ _W,    _T,    0.80],   //  6  right-top-rear
+  [-_W,    _B,    0.80],   //  7  left-bot-rear
+  [ _W,    _B,    0.80],   //  8  right-bot-rear
+  [-1.55,  0.04,  0.22],   //  9  left-wing tip
+  [ 1.55,  0.04,  0.22],   // 10  right-wing tip
+  [-0.38,  _B,    1.35],   // 11  left-engine
+  [ 0.38,  _B,    1.35],   // 12  right-engine
+  [ 0.00,  _T+0.22, 0.80], // 13  tail-fin top
+  [ 0.00,  _T+0.06,-0.80], // 14  cockpit canopy
 ]
 const SHIP_E = [
-  [0,1],[0,2],[1,2],[1,3],[2,4],[3,4],
-  [1,5],[5,3],[2,6],[6,4],
-  [3,7],[4,8],[7,8],[7,9],[8,9],
-  [10,11],[10,12],[11,12],[11,13],[12,14],[13,14],
-  [10,0],[13,3],[14,4],
+  // Nose → front cross-section
+  [0,1],[0,2],[0,3],[0,4],
+  // Front ring
+  [1,2],[3,4],[1,3],[2,4],
+  // Longitudinal rails
+  [1,5],[2,6],[3,7],[4,8],
+  // Rear ring
+  [5,6],[7,8],[5,7],[6,8],
+  // Wings (delta triangle each side)
+  [1,9],[5,9],[3,9],
+  [2,10],[6,10],[4,10],
+  // Engine pods (bottom rear)
+  [7,11],[8,12],[11,12],
+  // Tail fin
+  [13,5],[13,6],
+  // Cockpit canopy
+  [0,14],[14,1],[14,2],
 ]
 
 function NavAnim() {
@@ -164,23 +179,26 @@ function NavAnim() {
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     let angle = 0, raf
-    const PITCH = 0.20
 
-    // Generate a static star field once
+    // Static star field
     stars.current = Array.from({ length: 48 }, () => ({
-      x: Math.random(),
-      y: Math.random(),
+      x: Math.random(), y: Math.random(),
       r: 0.4 + Math.random() * 1.0,
       a: 0.15 + Math.random() * 0.50,
     }))
 
     function project([x, y, z], W, H) {
-      const cosA = Math.cos(angle), sinA = Math.sin(angle)
-      const cosP = Math.cos(PITCH), sinP = Math.sin(PITCH)
-      const rx  = x * cosA + z * sinA
-      const rz0 = -x * sinA + z * cosA
-      const ry  = y * cosP - rz0 * sinP
-      const rz  = y * sinP + rz0 * cosP
+      // Two-axis tumble: yaw + pitch at irrational ratio (never repeats)
+      const yaw   = angle
+      const pitch = angle * 0.4142
+      // Yaw around Y axis
+      const cy = Math.cos(yaw),   sy = Math.sin(yaw)
+      const rx  =  x * cy + z * sy
+      const rz0 = -x * sy + z * cy
+      // Pitch around X axis
+      const cp = Math.cos(pitch), sp = Math.sin(pitch)
+      const ry  =  y * cp - rz0 * sp
+      const rz  =  y * sp + rz0 * cp
       const FOV = 4.6
       const pz  = rz + FOV
       const sc  = Math.min(W, H) * 0.275
