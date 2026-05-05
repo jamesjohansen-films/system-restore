@@ -4,6 +4,7 @@ import './LifeSupportModule.css'
 // ── Constants ──────────────────────────────────────────────────────────────────
 const NUM_COLS = 6
 const CHAN_X   = [22, 54, 86, 118, 150, 182]   // shared 200-unit viewBox x positions
+const MAX_VAL  = 4                              // highest target/result value across all rounds
 
 // ── Puzzle data ────────────────────────────────────────────────────────────────
 const ROUND_DATA = [
@@ -82,52 +83,73 @@ function computeResult(selectedIds, frags) {
   return result
 }
 
-// ── Spectral strip — target + live result overlaid ─────────────────────────────
-//   matched  → white  (result[i] === target[i], both non-zero or target=0 & result=0)
-//   wrong    → red    (result differs from target)
-//   pending  → dim    (target > 0, nothing placed yet)
+// ── Spectral strip — bars grow from the bottom; height = value / MAX_VAL ───────
+//   pending  → dim ghost bar at target height (shows the goal)
+//   matched  → bright white bar, exactly target height ✓
+//   wrong    → red bar at result height + white target marker line
 function SpecStrip({ target, result }) {
-  const vw = 200, vh = 50
+  const vw = 200, vh = 44
+  const BW = 12   // bar width in viewBox units
+
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
       {CHAN_X.map((x, i) => {
-        const matched = result[i] === target[i] && target[i] !== 0
-        const wrong   = result[i] !== 0 && result[i] !== target[i]
-        const pending = target[i] > 0 && result[i] === 0
-        if (matched) return (
-          <line key={i} x1={x} y1={0} x2={x} y2={vh}
-            stroke="white" strokeWidth="3" vectorEffect="non-scaling-stroke"/>
+        const tgt = target[i]
+        const res = result[i]
+        if (tgt === 0 && res === 0) return null
+
+        const matched = res === tgt && tgt !== 0
+        const tgtH   = tgt > 0 ? (tgt / MAX_VAL) * vh : 0
+        const resH   = res !== 0 ? (Math.min(Math.abs(res), MAX_VAL) / MAX_VAL) * vh : 0
+
+        return (
+          <g key={i}>
+            {/* Ghost: empty target column when nothing selected yet */}
+            {tgt > 0 && res === 0 && (
+              <rect x={x - BW/2} y={vh - tgtH} width={BW} height={tgtH}
+                fill="rgba(255,255,255,0.07)"
+                stroke="rgba(255,255,255,0.18)" strokeWidth="0.5"
+                vectorEffect="non-scaling-stroke"/>
+            )}
+            {/* Result bar: white if matched, red if not */}
+            {res !== 0 && (
+              <rect x={x - BW/2} y={vh - resH} width={BW} height={resH}
+                fill={matched ? 'rgba(255,255,255,0.88)' : 'rgba(193,18,31,0.78)'}/>
+            )}
+            {/* Target marker line — visible when result is wrong so player sees the goal */}
+            {tgt > 0 && !matched && (
+              <line
+                x1={x - BW/2 - 1} y1={vh - tgtH}
+                x2={x + BW/2 + 1} y2={vh - tgtH}
+                stroke="rgba(255,255,255,0.6)" strokeWidth="1"
+                vectorEffect="non-scaling-stroke"/>
+            )}
+          </g>
         )
-        if (wrong) return (
-          <line key={i} x1={x} y1={0} x2={x} y2={vh}
-            stroke="#c1121f" strokeWidth="3" vectorEffect="non-scaling-stroke"/>
-        )
-        if (pending) return (
-          <line key={i} x1={x} y1={0} x2={x} y2={vh}
-            stroke="rgba(255,255,255,0.22)" strokeWidth="2" vectorEffect="non-scaling-stroke"/>
-        )
-        return null
       })}
     </svg>
   )
 }
 
-// ── Fragment row strip ─────────────────────────────────────────────────────────
+// ── Fragment strip — bar height shows magnitude; value labels at bottom ────────
+//   positive → white bar growing from bottom
+//   negative → red bar hanging from top (subtractive contribution)
 function FragStrip({ bars }) {
   const vw = 200, vh = 28
+  const BW = 12
+
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} width="100%" height="100%" preserveAspectRatio="none">
       {bars.map((v, i) => {
         if (v === 0) return null
-        const x = CHAN_X[i]
-        if (v < 0) return (
-          <line key={i} x1={x} y1={0} x2={x} y2={vh}
-            stroke="#c1121f" strokeWidth="3" strokeDasharray="5 4"
-            vectorEffect="non-scaling-stroke"/>
-        )
+        const x   = CHAN_X[i]
+        const h   = (Math.abs(v) / MAX_VAL) * vh
+        const neg = v < 0
         return (
-          <line key={i} x1={x} y1={0} x2={x} y2={vh}
-            stroke="white" strokeWidth="3" vectorEffect="non-scaling-stroke"/>
+          <rect key={i}
+            x={x - BW/2} y={neg ? 0 : vh - h}
+            width={BW} height={h}
+            fill={neg ? 'rgba(193,18,31,0.65)' : 'rgba(255,255,255,0.78)'}/>
         )
       })}
     </svg>
