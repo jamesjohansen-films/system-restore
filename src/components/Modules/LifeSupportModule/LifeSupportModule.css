@@ -55,7 +55,7 @@
 .ls-round-pip {
   width: 18px;
   height: 18px;
-  border: 1px solid #1a2a1a;
+  border: 1px solid #2a3a2a;
   border-radius: 2px;
   display: flex;
   align-items: center;
@@ -63,7 +63,7 @@
   font-family: 'VT323', monospace;
   font-size: 0.72rem;
   letter-spacing: 0;
-  color: #222a22;
+  color: #4a6a4a;
   flex-shrink: 0;
   transition: border-color 0.2s, color 0.2s;
 }
@@ -96,7 +96,7 @@
 .ls-section-label {
   font-size: 0.63rem;
   letter-spacing: 0.09em;
-  color: #2a3a2a;
+  color: #4e6e4e;
   flex-shrink: 0;
 }
 
@@ -178,7 +178,7 @@
   transform: translateY(-50%);
   font-family: 'VT323', monospace;
   font-size: 0.65rem;
-  color: #1a2a1a;
+  color: #3e5e3e;
   z-index: 2;
   pointer-events: none;
   line-height: 1;

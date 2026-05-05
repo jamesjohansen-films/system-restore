@@ -69,8 +69,8 @@
 
 .nav-auth-submit {
   background: none;
-  border: 1px solid #1a2030;
-  color: #3a4e6a;
+  border: 1px solid #253050;
+  color: #5a7090;
   font-family: 'VT323', monospace;
   font-size: 0.82rem;
   letter-spacing: 0.12em;
@@ -222,7 +222,7 @@
 /* Section label */
 .nav-section-label {
   font-size: 0.7rem;
-  color: #2a3a5a;
+  color: #4e6a98;
   letter-spacing: 0.1em;
   margin-bottom: 3px;
 }
@@ -240,7 +240,7 @@
   font-size: 0.7rem;
   font-weight: normal;
   text-align: left;
-  color: #2a3a5a;
+  color: #4e6a98;
   letter-spacing: 0.08em;
   padding: 1px 5px 3px;
   border-bottom: 1px solid #111820;
@@ -251,7 +251,7 @@
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   padding: 2px 5px;
-  color: #4a5e80;
+  color: #6a80aa;
   border-bottom: 1px solid #0c0c16;
   transition: color 0.3s;
 }
@@ -288,7 +288,7 @@
 .nav-signal-period {
   font-family: 'VT323', monospace;
   font-size: 0.72rem;
-  color: #2a3a5a;
+  color: #4e6a98;
   letter-spacing: 0.06em;
 }
 
@@ -301,7 +301,7 @@
 .nav-select {
   background: #050810;
   border: 1px solid #1a2030;
-  color: #4a5e80;
+  color: #6a80aa;
   font-family: 'VT323', monospace;
   font-size: 0.8rem;
   letter-spacing: 0.04em;
@@ -329,7 +329,7 @@
   padding: 7px 10px;
   background: none;
   border: 1px solid #1a2030;
-  color: #2a3a5a;
+  color: #4e6a98;
   font-family: 'VT323', monospace;
   font-size: 0.85rem;
   letter-spacing: 0.1em;
@@ -400,7 +400,7 @@
 .nav-result-sub {
   font-family: 'VT323', monospace;
   font-size: 0.7rem;
-  color: #3a5a80;
+  color: #5a7aaa;
   letter-spacing: 0.05em;
 }
 
@@ -436,7 +436,7 @@
 .nav-scan-label {
   font-size: 0.64rem;
   letter-spacing: 0.1em;
-  color: #2a3a5a;
+  color: #4e6a98;
   margin-bottom: 2px;
   flex-shrink: 0;
 }
@@ -473,7 +473,7 @@
 .nav-dials-hint {
   font-size: 0.70rem;
   letter-spacing: 0.08em;
-  color: #2a3a5a;
+  color: #4e6a98;
   border: 1px solid #0f1422;
   background: rgba(5, 8, 20, 0.4);
   padding: 5px 8px;
@@ -510,7 +510,7 @@
   font-family: 'VT323', monospace;
   font-size: 0.78rem;
   letter-spacing: 0.18em;
-  color: #2a3a5a;
+  color: #4e6a98;
   transition: color 0.3s;
 }
 
@@ -529,7 +529,7 @@
 .nav-dial-btn {
   background: none;
   border: 1px solid #1a2030;
-  color: #2a3a5a;
+  color: #4e6a98;
   font-family: 'VT323', monospace;
   font-size: 0.9rem;
   padding: 2px 8px;
@@ -551,7 +551,7 @@
 .nav-dial-value {
   font-family: 'VT323', monospace;
   font-size: 0.90rem;
-  color: #2a3a5a;
+  color: #4e6a98;
   letter-spacing: 0.08em;
   min-width: 38px;
   text-align: center;
@@ -613,7 +613,7 @@
 .nav-3d-label {
   font-size: 0.62rem;
   letter-spacing: 0.1em;
-  color: #2a3a5a;
+  color: #4e6a98;
 }
 
 .nav-3d-svg {
@@ -688,7 +688,7 @@
   font-family: 'VT323', monospace;
   font-size: 0.92rem;
   letter-spacing: 0.08em;
-  color: #2a3a5a;
+  color: #4e6a98;
   min-width: 38px;
   text-align: right;
   flex-shrink: 0;

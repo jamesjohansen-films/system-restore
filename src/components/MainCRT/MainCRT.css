@@ -143,7 +143,7 @@
 
 .main-crt__boot .terminal-text {
   font-size: 1.2rem;
-  color: #484848;
+  color: #6c6c6c;
 }
 
 .main-crt__boot .terminal-text--highlight {
@@ -177,7 +177,7 @@
 }
 
 .main-crt__input::placeholder {
-  color: #2a2a2a;
+  color: #484848;
 }
 
 .main-crt__prompt-arrow {
@@ -186,7 +186,7 @@
 
 .main-crt__hint {
   font-size: 0.85rem;
-  color: #2a2a2a;
+  color: #4e4e4e;
   letter-spacing: 0.12em;
   margin-left: 10px;
   align-self: flex-end;
@@ -295,19 +295,19 @@
 
 .mct-module-label {
   font-size: 0.9rem;
-  color: #383838;
+  color: #5c5c5c;
   letter-spacing: 0.1em;
 }
 
 .mct-module-name {
   font-size: 1rem;
   letter-spacing: 0.12em;
-  color: #666;
+  color: #7a7a7a;
 }
 
 /* Accessible row highlights name */
 .mct-module-row--accessible .mct-module-name {
-  color: #909090;
+  color: #aaaaaa;
 }
 
 /* Restored row */
@@ -326,16 +326,16 @@
 .mct-module-row:nth-child(4).mct-module-row--accessible .mct-module-status { animation-duration: 3.7s; animation-delay: 0.9s; }
 .mct-module-row:nth-child(5).mct-module-row--accessible .mct-module-status { animation-duration: 5.5s; animation-delay: 2.3s; }
 .mct-module-row--restored    .mct-module-status { color: #00dfd8; }
-.mct-module-row--locked      .mct-module-status { color: #2a2a2a; }
+.mct-module-row--locked      .mct-module-status { color: #4a4a4a; }
 
 .mct-module-action {
   font-size: 0.82rem;
   letter-spacing: 0.1em;
-  color: #484848;
+  color: #686868;
   white-space: nowrap;
 }
 .mct-module-row--accessible:hover .mct-module-action {
-  color: #909090;
+  color: #aaaaaa;
 }
 
 .mct-modules-footer {
@@ -345,6 +345,6 @@
 }
 
 /* ── Shared text helpers ── */
-.mct-highlight { color: #767676; }
-.mct-arrow     { color: #3a3a3a; }
+.mct-highlight { color: #909090; }
+.mct-arrow     { color: #5a5a5a; }
 .mct-error     { color: #c1121f; font-size: 1rem; letter-spacing: 0.08em; animation: glitch-flicker 5.2s linear infinite; animation-delay: 1.4s; }

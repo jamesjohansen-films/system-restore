@@ -22,8 +22,8 @@
 
 .pm-back {
   background: none;
-  border: 1px solid #1e1e1e;
-  color: #333;
+  border: 1px solid #2a2a2a;
+  color: #565656;
   font-size: 0.82rem;
   padding: 2px 10px;
   cursor: pointer; --cursor-hot: 1;
@@ -32,12 +32,12 @@
   font-family: var(--font-terminal);
   transition: color 0.2s, border-color 0.2s;
 }
-.pm-back:hover { color: #666; border-color: #383838; }
+.pm-back:hover { color: #888; border-color: #505050; }
 
 .pm-title {
   font-size: 0.95rem;
   letter-spacing: 0.16em;
-  color: #484848;
+  color: #6c6c6c;
 }
 
 .pm-counter {
@@ -160,7 +160,7 @@
 .pm-panel-text {
   font-family: 'VT323', monospace;
   font-size: 13px;
-  fill: #303030;
+  fill: #525252;
   letter-spacing: 0.12em;
   user-select: none;
 }
@@ -168,7 +168,7 @@
 .pm-panel-subtext {
   font-family: 'VT323', monospace;
   font-size: 9px;
-  fill: #222;
+  fill: #444;
   letter-spacing: 0.08em;
   user-select: none;
 }
@@ -199,7 +199,7 @@
 .pm-circuit__label {
   font-size: 0.72rem;
   letter-spacing: 0.14em;
-  color: #404040;
+  color: #646464;
   flex-shrink: 0;
 }
 
@@ -244,7 +244,7 @@
 
 .pm-fragment__label {
   font-size: 0.80rem;
-  color: #3a3a3a;
+  color: #5c5c5c;
   letter-spacing: 0.12em;
 }
 
@@ -255,7 +255,7 @@
 
 .pm-fragment__data .terminal-text {
   font-size: 0.76rem;
-  color: #303030;
+  color: #525252;
 }
 
 .pm-fragment__value { color: #606060 !important; }
@@ -268,7 +268,7 @@
 }
 .pm-fragment__sig-note {
   font-size: 0.68rem !important;
-  color: #3a1a1a !important;
+  color: #6a3535 !important;
   letter-spacing: 0.08em;
 }
 
