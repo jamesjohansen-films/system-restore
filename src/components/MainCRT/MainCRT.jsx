@@ -130,7 +130,7 @@ function MainCRT({ stage, modules, onStageChange, onModuleRestore }) {
                   INITIALIZE BOOT SEQUENCE?
                 </p>
                 <div className="main-crt__prompt">
-                  <span className="terminal-text mct-arrow">&gt;&nbsp;</span>
+                  <span className="terminal-text mct-arrow terminal-cursor">&gt;&nbsp;</span>
                   <input
                     className="main-crt__input terminal-text"
                     type="text"
@@ -162,7 +162,7 @@ function MainCRT({ stage, modules, onStageChange, onModuleRestore }) {
                   INITIALIZE BOOT SEQUENCE?
                 </p>
                 <div className="main-crt__prompt">
-                  <span className="terminal-text mct-arrow">&gt;&nbsp;</span>
+                  <span className="terminal-text mct-arrow terminal-cursor">&gt;&nbsp;</span>
                   <input
                     className="main-crt__input terminal-text"
                     type="text"
