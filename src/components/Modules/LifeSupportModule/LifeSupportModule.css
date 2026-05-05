@@ -112,6 +112,7 @@
   height: 54px;
   overflow: hidden;
   flex-shrink: 0;
+  position: relative;          /* needed for scan bar absolute positioning */
   background: linear-gradient(to right,
     #1a0033 0%,
     #000e66 17%,
@@ -121,6 +122,55 @@
     #442200 83%,
     #330000 100%
   );
+}
+
+/* ── Blue scan bar that sweeps the spectrograph on correct submit ── */
+.ls-scan-bar {
+  position: absolute;
+  inset-block: 0;        /* top:0; bottom:0 */
+  width: 6%;
+  left: -8%;
+  pointer-events: none;
+  z-index: 4;
+  background: linear-gradient(to right,
+    transparent                  0%,
+    rgba(80, 200, 255, 0.18)    25%,
+    rgba(160, 230, 255, 0.90)   48%,
+    rgba(220, 245, 255, 1.00)   50%,
+    rgba(160, 230, 255, 0.90)   52%,
+    rgba(80, 200, 255, 0.18)    75%,
+    transparent                 100%
+  );
+  animation: ls-scan-sweep 0.95s cubic-bezier(0.3, 0, 0.7, 1) forwards;
+  box-shadow: 0 0 12px 2px rgba(120, 220, 255, 0.35);
+}
+
+@keyframes ls-scan-sweep {
+  0%   { left: -8%;  opacity: 0; }
+  6%   { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { left: 106%; opacity: 0; }
+}
+
+/* Status text while scanning */
+.ls-status--scanning {
+  color: #00dfd8;
+  animation: glitch-flicker 0.6s linear infinite;
+  text-shadow: 0 0 8px rgba(0,223,216,0.5);
+}
+
+/* Fragment rows while scan is running — dim and non-interactive */
+.ls-frag-row--scanning {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Submit button scanning state */
+.ls-submit--scanning {
+  border-color: #00dfd8 !important;
+  color: #00dfd8 !important;
+  animation: glitch-flicker 0.6s linear infinite;
+  cursor: wait !important;
 }
 
 /* ── Fragment list — stacked full-width rows, all aligned ── */

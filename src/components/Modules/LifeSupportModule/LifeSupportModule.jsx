@@ -7,45 +7,57 @@ const CHAN_X   = [22, 54, 86, 118, 150, 182]   // shared 200-unit viewBox x posi
 const MAX_VAL  = 4                              // highest target/result value across all rounds
 
 // ── Puzzle data ────────────────────────────────────────────────────────────────
+// Design principle for decoys:
+//   Rounds 1 & 2 have a ZERO column in the target. Correct fragments never put
+//   anything in that column. Every decoy has a conspicuous bar there — instantly
+//   telling the player "this can't fit."
+//   Round 3 has no zero column, so decoys use dramatically different bar
+//   distributions (sparse alternating vs. the correct fragments' varied heights).
+
 const ROUND_DATA = [
   {
     id: 1, label: 'COMPOUND IDENTIFICATION',
+    // Target col 4 = 0.  Correct frags: col4=0.  Decoys: col4>0 (impossible to use).
     target:     [2, 4, 1, 3, 0, 2],
     slotsCount: 2,
     bankCount:  4,
     fragments: [
-      { id:'r1-a', bars:[ 1, 2, 1, 2, 0, 1] },  // ✓
-      { id:'r1-b', bars:[ 1, 2, 0, 1, 0, 1] },  // ✓
-      { id:'r1-c', bars:[ 2, 2, 1, 2, 0, 1] },
-      { id:'r1-d', bars:[ 1, 3, 0, 1, 0, 1] },
-      { id:'r1-e', bars:[ 1, 2, 0, 2, 0, 2] },
-      { id:'r1-f', bars:[ 0, 1, 1, 1, 0, 1] },
-      { id:'r1-g', bars:[-1, 1, 0, 0, 0, 0] },
-      { id:'r1-h', bars:[ 2, 3, 1, 2, 0, 1] },
-      { id:'r1-i', bars:[ 1, 1, 1, 2, 0, 1] },
-      { id:'r1-j', bars:[ 1, 2, 1, 1, 0, 0] },
+      { id:'r1-a', bars:[ 1, 2, 1, 2, 0, 1] },  // ✓  col4=0
+      { id:'r1-b', bars:[ 1, 2, 0, 1, 0, 1] },  // ✓  col4=0
+      // ── Decoys — all have a bar at col4 (target=0) ──
+      { id:'r1-c', bars:[ 1, 2, 1, 2, 3, 1] },  // tall col4 bar
+      { id:'r1-d', bars:[ 1, 2, 0, 1, 2, 1] },  // col4 bar
+      { id:'r1-e', bars:[ 3, 0, 1, 0, 2, 3] },  // different heights + col4
+      { id:'r1-f', bars:[ 0, 3, 0, 3, 1, 0] },  // concentrated + col4
+      { id:'r1-g', bars:[ 2, 1, 2, 0, 3, 2] },  // tall col4
+      { id:'r1-h', bars:[ 0, 2, 1, 1, 2, 2] },  // col4
+      { id:'r1-i', bars:[ 2, 0, 2, 2, 1, 1] },  // col4
+      { id:'r1-j', bars:[ 1, 1, 0, 3, 2, 0] },  // col4
     ],
   },
   {
     id: 2, label: 'CATALYST TRACE',
+    // Target col 3 = 0.  Correct frags: col3=0.  Decoys: col3>0 (impossible).
     target:     [3, 1, 4, 0, 2, 3],
     slotsCount: 4,
     bankCount:  6,
     fragments: [
-      { id:'r2-a', bars:[ 2, 0, 2, 0, 1, 2] },  // ✓
-      { id:'r2-b', bars:[ 1, 0, 1, 0, 1, 1] },  // ✓
-      { id:'r2-c', bars:[ 1, 1, 2, 0, 1, 1] },  // ✓
-      { id:'r2-d', bars:[-1, 0,-1, 0,-1,-1] },  // ✓ subtractive
-      { id:'r2-e', bars:[ 2, 0, 3, 0, 1, 2] },
-      { id:'r2-f', bars:[ 1, 1, 1, 0, 1, 1] },
-      { id:'r2-g', bars:[-1, 0,-2, 0,-1,-1] },
-      { id:'r2-h', bars:[ 2, 1, 2, 0, 1, 2] },
-      { id:'r2-i', bars:[ 1, 0, 1, 0, 0, 1] },
-      { id:'r2-j', bars:[-2, 0,-1, 0,-1,-2] },
+      { id:'r2-a', bars:[ 2, 0, 2, 0, 1, 2] },  // ✓  col3=0
+      { id:'r2-b', bars:[ 1, 0, 1, 0, 1, 1] },  // ✓  col3=0
+      { id:'r2-c', bars:[ 1, 1, 2, 0, 1, 1] },  // ✓  col3=0
+      { id:'r2-d', bars:[-1, 0,-1, 0,-1,-1] },  // ✓  col3=0  (subtractive)
+      // ── Decoys — all have a bar at col3 (target=0) ──
+      { id:'r2-e', bars:[ 2, 0, 3, 3, 1, 2] },  // tall col3 bar
+      { id:'r2-f', bars:[ 1, 1, 1, 2, 1, 1] },  // col3
+      { id:'r2-g', bars:[-1, 0,-2, 1, 0,-1] },  // col3 (subtractive-looking)
+      { id:'r2-h', bars:[ 2, 1, 2, 3, 0, 2] },  // tall col3
+      { id:'r2-i', bars:[ 1, 0, 1, 2, 0, 1] },  // col3
+      { id:'r2-j', bars:[-2, 0,-1, 2, 0,-2] },  // col3 (subtractive)
     ],
   },
   {
     id: 3, label: 'MUTATION MARKER',
+    // No zero column — decoys use sparse/extreme distributions instead.
     target:     [2, 3, 1, 4, 2, 3],
     slotsCount: 6,
     bankCount: 10,
@@ -53,13 +65,14 @@ const ROUND_DATA = [
       { id:'r3-a', bars:[ 1, 1, 1, 2, 1, 1] },  // ✓
       { id:'r3-b', bars:[ 1, 1, 0, 1, 1, 1] },  // ✓
       { id:'r3-c', bars:[ 2, 1, 1, 2, 1, 2] },  // ✓
-      { id:'r3-d', bars:[-1, 1, 0, 0, 0, 0] },  // ✓ subtractive
+      { id:'r3-d', bars:[-1, 1, 0, 0, 0, 0] },  // ✓  subtractive
       { id:'r3-e', bars:[ 0, 0, 0, 1, 0, 1] },  // ✓
-      { id:'r3-f', bars:[-1,-1,-1,-2,-1,-2] },  // ✓ subtractive
-      { id:'r3-g', bars:[ 2, 1, 1, 2, 1, 1] },
-      { id:'r3-h', bars:[-1,-1, 0,-1, 0,-1] },
-      { id:'r3-i', bars:[ 1, 2, 1, 2, 1, 2] },
-      { id:'r3-j', bars:[ 0, 1, 0, 1, 1, 1] },
+      { id:'r3-f', bars:[-1,-1,-1,-2,-1,-2] },  // ✓  subtractive
+      // ── Decoys — very different visual patterns ──
+      { id:'r3-g', bars:[ 4, 0, 3, 0, 4, 0] },  // only even cols, max height
+      { id:'r3-h', bars:[ 0, 4, 0, 4, 0, 4] },  // only odd cols, max height
+      { id:'r3-i', bars:[ 3, 3, 3, 3, 3, 3] },  // all same, too tall
+      { id:'r3-j', bars:[-3,-2, 0,-3,-2,-3] },  // all strongly subtractive
     ],
   },
 ]
@@ -167,12 +180,13 @@ export default function LifeSupportModule({ onSolve, onBack }) {
     })
   )
 
-  const [roundIdx,   setRoundIdx]   = useState(0)
+  const [roundIdx,    setRoundIdx]    = useState(0)
   const [selectedIds, setSelectedIds] = useState(() => new Set())
-  const [error,      setError]      = useState(false)
-  const [roundWin,   setRoundWin]   = useState(false)
-  const [solved,     setSolved]     = useState(false)
-  const [showFrag,   setShowFrag]   = useState(false)
+  const [error,       setError]       = useState(false)
+  const [scanning,    setScanning]    = useState(false)   // blue scan sweep
+  const [roundWin,    setRoundWin]    = useState(false)
+  const [solved,      setSolved]      = useState(false)
+  const [showFrag,    setShowFrag]    = useState(false)
 
   const round     = rounds[roundIdx]
   const result    = computeResult(selectedIds, round.fragments)
@@ -181,6 +195,7 @@ export default function LifeSupportModule({ onSolve, onBack }) {
 
   // ── Toggle a fragment on/off ──────────────────────────────────────────────
   function toggleFrag(id) {
+    if (scanning) return
     setSelectedIds(prev => {
       const next = new Set(prev)
       if (next.has(id)) {
@@ -195,21 +210,27 @@ export default function LifeSupportModule({ onSolve, onBack }) {
 
   // ── Submit ────────────────────────────────────────────────────────────────
   function handleSubmit() {
-    if (!allFilled) return
+    if (!allFilled || scanning) return
     if (isMatch) {
-      setRoundWin(true)
+      // 1. Trigger blue scan sweep across the spectrograph
+      setScanning(true)
       setTimeout(() => {
-        setRoundWin(false)
-        const next = roundIdx + 1
-        if (next < ROUND_DATA.length) {
-          setRoundIdx(next)
-          setSelectedIds(new Set())
-          setError(false)
-        } else {
-          setSolved(true)
-          setTimeout(() => setShowFrag(true), 800)
-        }
-      }, 1400)
+        setScanning(false)
+        // 2. Show round-win flash
+        setRoundWin(true)
+        setTimeout(() => {
+          setRoundWin(false)
+          const next = roundIdx + 1
+          if (next < ROUND_DATA.length) {
+            setRoundIdx(next)
+            setSelectedIds(new Set())
+            setError(false)
+          } else {
+            setSolved(true)
+            setTimeout(() => setShowFrag(true), 800)
+          }
+        }, 1400)
+      }, 950)   // scan duration
     } else {
       setError(true)
       setTimeout(() => setError(false), 1600)
@@ -218,7 +239,7 @@ export default function LifeSupportModule({ onSolve, onBack }) {
 
   // ── Dev skip ─────────────────────────────────────────────────────────────
   function devSkip() {
-    if (solved || roundWin) return
+    if (solved || roundWin || scanning) return
     const next = roundIdx + 1
     if (next < ROUND_DATA.length) {
       setRoundIdx(next)
@@ -232,6 +253,7 @@ export default function LifeSupportModule({ onSolve, onBack }) {
 
   const statusText = solved   ? '✓ ANALYSIS COMPLETE'
     : roundWin                ? '✓ PATTERN MATCHED'
+    : scanning                ? '◈ SCANNING...'
     : `SCAN ${roundIdx + 1} / 3`
 
   return (
@@ -242,7 +264,10 @@ export default function LifeSupportModule({ onSolve, onBack }) {
       <div className="ls-header">
         <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
         <span className="pm-title terminal-text">MODULE 04 — LIFE SUPPORT</span>
-        <span className={`ls-status terminal-text ${solved ? 'ls-status--restored' : roundWin ? 'ls-status--matched' : ''}`}>
+        <span className={`ls-status terminal-text
+          ${solved   ? 'ls-status--restored' : ''}
+          ${roundWin ? 'ls-status--matched'  : ''}
+          ${scanning ? 'ls-status--scanning' : ''}`}>
           {statusText}
         </span>
       </div>
@@ -270,10 +295,11 @@ export default function LifeSupportModule({ onSolve, onBack }) {
       {!solved && !roundWin && (
         <div className="ls-body">
 
-          {/* Spec strip */}
+          {/* Spec strip + optional scan bar overlay */}
           <div className="ls-spec-label terminal-text terminal-text--dim">// SPECTRAL ANALYSIS</div>
           <div className="ls-spec-wrap">
             <SpecStrip target={round.target} result={result}/>
+            {scanning && <div className="ls-scan-bar" key={roundIdx}/>}
           </div>
 
           {/* Fragment list — all stacked, click to select */}
@@ -290,7 +316,8 @@ export default function LifeSupportModule({ onSolve, onBack }) {
                   key={f.id}
                   className={`ls-frag-row
                     ${isSelected ? 'ls-frag-row--selected' : ''}
-                    ${!isSelected && atMax ? 'ls-frag-row--locked' : ''}`}
+                    ${!isSelected && atMax ? 'ls-frag-row--locked' : ''}
+                    ${scanning ? 'ls-frag-row--scanning' : ''}`}
                   onClick={() => toggleFrag(f.id)}
                 >
                   <span className="ls-frag-idx terminal-text">{idx + 1}</span>
@@ -309,10 +336,13 @@ export default function LifeSupportModule({ onSolve, onBack }) {
           )}
 
           <button
-            className={`ls-submit terminal-text ${allFilled ? 'ls-submit--ready' : ''} ${error ? 'ls-submit--error' : ''}`}
-            disabled={!allFilled}
+            className={`ls-submit terminal-text
+              ${allFilled && !scanning ? 'ls-submit--ready' : ''}
+              ${error ? 'ls-submit--error' : ''}
+              ${scanning ? 'ls-submit--scanning' : ''}`}
+            disabled={!allFilled || scanning}
             onClick={handleSubmit}>
-            [ SUBMIT SPECTRAL ANALYSIS ]
+            {scanning ? '[ ANALYZING... ]' : '[ SUBMIT SPECTRAL ANALYSIS ]'}
           </button>
         </div>
       )}
