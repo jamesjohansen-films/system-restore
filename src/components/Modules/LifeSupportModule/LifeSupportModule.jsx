@@ -344,6 +344,26 @@ export default function LifeSupportModule({ onSolve, onBack }) {
             onClick={handleSubmit}>
             {scanning ? '[ ANALYZING... ]' : '[ SUBMIT SPECTRAL ANALYSIS ]'}
           </button>
+
+          {/* ── Crew log ── */}
+          <div className="crew-log-strip">
+            <div className="crew-log-entry">
+              <div className="crew-log-meta">
+                <span className="terminal-text crew-log-who">◈ LOG — KOWALSKI</span>
+                <span className="terminal-text crew-log-day">MISSION DAY 24</span>
+              </div>
+              <p className="terminal-text crew-log-text">Vitagen-7 mutation rate has exceeded all projections. The compound is no longer stable. I should report this. I am not sure I should.</p>
+            </div>
+            {roundIdx >= 1 && (
+              <div className="crew-log-entry">
+                <div className="crew-log-meta">
+                  <span className="terminal-text crew-log-who">◈ LOG — KOWALSKI</span>
+                  <span className="terminal-text crew-log-day">MISSION DAY 25</span>
+                </div>
+                <p className="terminal-text crew-log-text">Hayes is gone. Chen is not responding. The Prometheus team triggered this. I know it. I cannot prove it.</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -381,6 +401,15 @@ export default function LifeSupportModule({ onSolve, onBack }) {
               </button>
             </div>
           )}
+            <div className="crew-log-strip" style={{marginTop: '6px'}}>
+              <div className="crew-log-entry crew-log-entry--prometheus">
+                <div className="crew-log-meta">
+                  <span className="terminal-text crew-log-who crew-log-who--prometheus">◈ LOG — KOWALSKI — FINAL</span>
+                  <span className="terminal-text crew-log-day crew-log-day--prometheus">DAY 25</span>
+                </div>
+                <p className="terminal-text crew-log-text crew-log-text--prometheus">I am sealing LAB-07. Vitagen-7 was designed to preserve consciousness. It worked in trials. Four instances. The ship will remember us. — K</p>
+              </div>
+            </div>
         </div>
       )}
     </div>

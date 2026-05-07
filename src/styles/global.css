@@ -366,3 +366,60 @@ html, body {
   --color-glow: rgba(0, 223, 216, 0.22);
   --font-terminal: 'Orbitron', sans-serif;
 }
+
+/* ── Crew Log Strip ──────────────────────────────────────────────────── */
+.crew-log-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+  padding-top: 5px;
+  border-top: 1px solid #0d0d0d;
+  margin-top: 6px;
+}
+
+.crew-log-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 3px 6px;
+  border-left: 2px solid #0f1a0f;
+  animation: nav-fade-in 0.6s ease-out;
+}
+
+.crew-log-entry--prometheus {
+  border-left-color: #1e0808;
+}
+
+.crew-log-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.crew-log-who {
+  font-family: 'VT323', monospace;
+  font-size: 0.63rem;
+  color: #3a5a3a;
+  letter-spacing: 0.10em;
+}
+
+.crew-log-who--prometheus { color: #6a3030; }
+
+.crew-log-day {
+  font-size: 0.56rem;
+  color: #2a3a2a;
+  letter-spacing: 0.06em;
+  margin-left: auto;
+}
+
+.crew-log-day--prometheus { color: #3a2020; }
+
+.crew-log-text {
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  line-height: 1.45;
+  color: #4a5a4a;
+}
+
+.crew-log-text--prometheus { color: #5a3535; }

@@ -435,6 +435,17 @@ export default function PowerModule({ onSolve, onBack }) {
             CLICK EACH SCREW TO UNTHREAD — REMOVE ALL {SCREWS_COUNT} SCREWS TO ACCESS PANEL
           </p>
         </div>
+
+        {/* ── Crew log ── */}
+        <div className="crew-log-strip">
+          <div className="crew-log-entry">
+            <div className="crew-log-meta">
+              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+              <span className="terminal-text crew-log-day">MISSION DAY 01</span>
+            </div>
+            <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule. Kowalski says it is routine calibration.</p>
+          </div>
+        </div>
       </div>
     )
   }
@@ -463,6 +474,24 @@ export default function PowerModule({ onSolve, onBack }) {
           circuitLabel={circuit.label}
           onCircuitSolve={sig => handleCircuitSolve(circuitIdx, sig)}
         />
+
+        {/* ── Crew log ── */}
+        <div className="crew-log-strip">
+          <div className="crew-log-entry">
+            <div className="crew-log-meta">
+              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+              <span className="terminal-text crew-log-day">MISSION DAY 01</span>
+            </div>
+            <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule.</p>
+          </div>
+          <div className="crew-log-entry">
+            <div className="crew-log-meta">
+              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+              <span className="terminal-text crew-log-day">MISSION DAY 14</span>
+            </div>
+            <p className="terminal-text crew-log-text">Power draw from LAB-07 spiked overnight. 340% above mission spec. Filed a report. Prometheus HQ replied: "Do not escalate." I am escalating anyway.</p>
+          </div>
+        </div>
       </div>
     )
   }
@@ -499,6 +528,31 @@ export default function PowerModule({ onSolve, onBack }) {
           </div>
         )}
       </div>
+
+        {/* ── Crew log ── */}
+        <div className="crew-log-strip">
+          <div className="crew-log-entry">
+            <div className="crew-log-meta">
+              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+              <span className="terminal-text crew-log-day">MISSION DAY 01</span>
+            </div>
+            <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule.</p>
+          </div>
+          <div className="crew-log-entry">
+            <div className="crew-log-meta">
+              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+              <span className="terminal-text crew-log-day">MISSION DAY 14</span>
+            </div>
+            <p className="terminal-text crew-log-text">Power draw from LAB-07 spiked 340% above mission spec. Filed a report. Prometheus HQ: "Do not escalate."</p>
+          </div>
+          <div className="crew-log-entry crew-log-entry--prometheus">
+            <div className="crew-log-meta">
+              <span className="terminal-text crew-log-who crew-log-who--prometheus">◈ PROMETHEUS INTERNAL — RECOVERED</span>
+              <span className="terminal-text crew-log-day crew-log-day--prometheus">DAY 14</span>
+            </div>
+            <p className="terminal-text crew-log-text crew-log-text--prometheus">Crew inquiry re: LAB-07 to be suppressed. Officer Hayes flagged for monitoring. Prometheus-7 protocol: active.</p>
+          </div>
+        </div>
     </div>
   )
 }

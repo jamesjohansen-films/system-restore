@@ -564,3 +564,143 @@
   animation: glitch-flicker 0.5s linear infinite;
   text-shadow: 0 0 8px rgba(0, 223, 216, 0.4);
 }
+
+/* ── Phase: center (launching tick) ── */
+.mc-body--center {
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.mc-launch-tick {
+  font-family: 'VT323', monospace;
+  font-size: 5.5rem;
+  color: #00dfd8;
+  text-shadow: 0 0 30px rgba(0, 223, 216, 0.6);
+  line-height: 1;
+  animation: glitch-flicker 0.35s linear infinite;
+}
+
+/* ── Phase: story typewriter ── */
+.mc-body--story {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding-right: 4px;
+  gap: 0;
+}
+
+.mc-body--story::-webkit-scrollbar { width: 2px; }
+.mc-body--story::-webkit-scrollbar-track { background: transparent; }
+.mc-body--story::-webkit-scrollbar-thumb { background: #1a1a2a; }
+
+.mc-story-line {
+  font-size: 0.71rem;
+  letter-spacing: 0.05em;
+  color: #5a6a8a;
+  line-height: 1.65;
+  animation: nav-fade-in 0.25s ease-out;
+  flex-shrink: 0;
+}
+
+.mc-story-sep {
+  color: #1a2030 !important;
+  font-size: 0.58rem;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+.mc-story-cursor {
+  font-size: 0.85rem;
+  color: #3a4e6a;
+  animation: glitch-flicker 0.9s step-start infinite;
+  flex-shrink: 0;
+}
+
+/* ── Phase: countdown ── */
+.mc-body--countdown {
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 6px;
+  gap: 7px;
+  overflow-y: auto;
+}
+
+.mc-countdown-header {
+  font-size: 0.76rem;
+  color: #00dfd8;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0 10px rgba(0, 223, 216, 0.35);
+  text-align: center;
+}
+
+.mc-countdown-sub {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-align: center;
+  margin-top: -4px;
+}
+
+/* ── Timer digits ── */
+.mc-timer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid #1a2030;
+  background: rgba(0, 5, 18, 0.45);
+  margin: 2px 0;
+}
+
+.mc-timer-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.mc-timer-digits {
+  font-family: 'VT323', monospace;
+  font-size: 2.6rem;
+  color: #00dfd8;
+  text-shadow: 0 0 18px rgba(0, 223, 216, 0.45);
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.mc-timer-label {
+  font-size: 0.50rem;
+  color: #2a3e5a;
+  letter-spacing: 0.10em;
+}
+
+.mc-timer-sep {
+  font-family: 'VT323', monospace;
+  font-size: 2.0rem;
+  color: #1e2e44;
+  align-self: flex-start;
+  padding-top: 4px;
+  line-height: 1;
+}
+
+/* ── Detail / frequency rows ── */
+.mc-countdown-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  align-self: stretch;
+  border-left: 1px solid #111820;
+  padding-left: 7px;
+}
+
+.mc-countdown-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.mc-countdown-row .terminal-text { font-size: 0.60rem; }
+.mc-countdown-val  { color: #4a6a9a !important; }
+.mc-freq-val       { color: #2a3e5a !important; letter-spacing: 0.05em; }
+.mc-freq-dim       { color: #3a5a7a !important; }
+.mc-freq-offline   { color: #3a2020 !important; }
