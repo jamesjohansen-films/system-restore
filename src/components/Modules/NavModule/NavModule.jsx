@@ -124,141 +124,147 @@ function TriSection({ pulsars, signals, ship, scanLabel, onComplete }) {
   return (
     <div className="nav-body">
 
-      {/* ── Star Map (left) ── */}
-      <div className="nav-map-wrap">
-        <div className="nav-scan-label terminal-text terminal-text--dim">{scanLabel}</div>
+      {/* ── Top row: Star Map (left) + Catalog (right) ── */}
+      <div className="nav-top-row">
 
-        <svg className="nav-map" viewBox={`0 0 ${MAP_W} ${MAP_H}`} preserveAspectRatio="xMidYMid meet">
-          <rect x={0} y={0} width={MAP_W} height={MAP_H} fill="#05070f" />
+        {/* Star map */}
+        <div className="nav-map-wrap">
+          <div className="nav-scan-label terminal-text terminal-text--dim">{scanLabel}</div>
 
-          {/* Grid lines */}
-          {Array.from({length:9}, (_,i) => (
-            <line key={`vg${i}`} x1={i*CELL} y1={0} x2={i*CELL} y2={MAP_H} className="nav-grid-line"/>
-          ))}
-          {Array.from({length:8}, (_,i) => (
-            <line key={`hg${i}`} x1={0} y1={i*CELL} x2={MAP_W} y2={i*CELL} className="nav-grid-line"/>
-          ))}
+          <svg className="nav-map" viewBox={`0 0 ${MAP_W} ${MAP_H}`} preserveAspectRatio="xMidYMid meet">
+            <rect x={0} y={0} width={MAP_W} height={MAP_H} fill="#05070f" />
 
-          {/* Grid labels */}
-          {['A','B','C','D','E','F','G','H'].map((l,i) => (
-            <text key={l} x={i*CELL+3} y={11} className="nav-grid-label">{l}</text>
-          ))}
-          {[1,2,3,4,5,6,7].map((n,i) => (
-            <text key={n} x={3} y={i*CELL+26} className="nav-grid-label">{n}</text>
-          ))}
+            {/* Grid lines */}
+            {Array.from({length:9}, (_,i) => (
+              <line key={`vg${i}`} x1={i*CELL} y1={0} x2={i*CELL} y2={MAP_H} className="nav-grid-line"/>
+            ))}
+            {Array.from({length:8}, (_,i) => (
+              <line key={`hg${i}`} x1={0} y1={i*CELL} x2={MAP_W} y2={i*CELL} className="nav-grid-line"/>
+            ))}
 
-          {/* Background stars */}
-          {BG_STARS.map(([x,y],i) => (
-            <circle key={i} cx={x} cy={y} r={0.7} className="nav-bg-star"/>
-          ))}
+            {/* Grid labels */}
+            {['A','B','C','D','E','F','G','H'].map((l,i) => (
+              <text key={l} x={i*CELL+3} y={11} className="nav-grid-label">{l}</text>
+            ))}
+            {[1,2,3,4,5,6,7].map((n,i) => (
+              <text key={n} x={3} y={i*CELL+26} className="nav-grid-label">{n}</text>
+            ))}
 
-          {/* Range circles */}
-          {showCircles && signals.map((sig,i) => {
-            const p = pulsars.find(p => p.id === selections[sig.id])
-            if (!p) return null
-            const r    = dist(p.pos, ship)
-            const circ = 2*Math.PI*r
-            return (
-              <circle key={sig.id}
-                cx={p.pos[0]} cy={p.pos[1]} r={r}
-                fill="none" stroke={sig.color}
-                strokeWidth={0.8} strokeOpacity={0.55}
-                style={{
-                  strokeDasharray: circ,
-                  strokeDashoffset: circ,
-                  animation: `nav-draw-circle 1.4s cubic-bezier(0.4,0,0.2,1) ${i*0.55}s forwards`,
-                }}
-              />
-            )
-          })}
+            {/* Background stars */}
+            {BG_STARS.map(([x,y],i) => (
+              <circle key={i} cx={x} cy={y} r={0.7} className="nav-bg-star"/>
+            ))}
 
-          {/* Pulsars */}
-          {pulsars.map(p => {
-            const matched = signals.find(s => selections[s.id] === p.id)
-            const dotColor = matched ? matched.color : '#3a4e7a'
-            return (
-              <g key={p.id}>
-                {matched && (
-                  <circle cx={p.pos[0]} cy={p.pos[1]} r={9}
-                    fill={matched.color} fillOpacity={0.08}/>
-                )}
-                <circle cx={p.pos[0]} cy={p.pos[1]}
-                  r={matched ? 3.5 : 2} fill={dotColor}
-                  className={`nav-pulsar ${matched ? 'nav-pulsar--active' : ''}`}
+            {/* Range circles */}
+            {showCircles && signals.map((sig,i) => {
+              const p = pulsars.find(p => p.id === selections[sig.id])
+              if (!p) return null
+              const r    = dist(p.pos, ship)
+              const circ = 2*Math.PI*r
+              return (
+                <circle key={sig.id}
+                  cx={p.pos[0]} cy={p.pos[1]} r={r}
+                  fill="none" stroke={sig.color}
+                  strokeWidth={0.8} strokeOpacity={0.55}
+                  style={{
+                    strokeDasharray: circ,
+                    strokeDashoffset: circ,
+                    animation: `nav-draw-circle 1.4s cubic-bezier(0.4,0,0.2,1) ${i*0.55}s forwards`,
+                  }}
                 />
-                <text x={p.pos[0]+5} y={p.pos[1]+4}
-                  className="nav-pulsar-label"
-                  fill={matched ? matched.color : '#3a4e7a'}>
-                  {p.id}
+              )
+            })}
+
+            {/* Pulsars */}
+            {pulsars.map(p => {
+              const matched = signals.find(s => selections[s.id] === p.id)
+              const dotColor = matched ? matched.color : '#3a4e7a'
+              return (
+                <g key={p.id}>
+                  {matched && (
+                    <circle cx={p.pos[0]} cy={p.pos[1]} r={9}
+                      fill={matched.color} fillOpacity={0.08}/>
+                  )}
+                  <circle cx={p.pos[0]} cy={p.pos[1]}
+                    r={matched ? 3.5 : 2} fill={dotColor}
+                    className={`nav-pulsar ${matched ? 'nav-pulsar--active' : ''}`}
+                  />
+                  <text x={p.pos[0]+5} y={p.pos[1]+4}
+                    className="nav-pulsar-label"
+                    fill={matched ? matched.color : '#3a4e7a'}>
+                    {p.id}
+                  </text>
+                </g>
+              )
+            })}
+
+            {/* Ship crosshair */}
+            {showShip && (
+              <g className="nav-ship">
+                <circle cx={ship[0]} cy={ship[1]} r={14}
+                  fill="none" stroke="#00ff88" strokeWidth={0.6} strokeOpacity={0.3}
+                  className="nav-ship-ring"/>
+                <line x1={ship[0]-9} y1={ship[1]} x2={ship[0]+9} y2={ship[1]}
+                  stroke="#00ff88" strokeWidth={0.8}/>
+                <line x1={ship[0]} y1={ship[1]-9} x2={ship[0]} y2={ship[1]+9}
+                  stroke="#00ff88" strokeWidth={0.8}/>
+                <circle cx={ship[0]} cy={ship[1]} r={1.8} fill="#00ff88" className="nav-ship-dot"/>
+                <text x={ship[0]+12} y={ship[1]-5} className="nav-ship-label">
+                  YOU ARE HERE
                 </text>
               </g>
-            )
-          })}
+            )}
+          </svg>
 
-          {/* Ship crosshair */}
-          {showShip && (
-            <g className="nav-ship">
-              <circle cx={ship[0]} cy={ship[1]} r={14}
-                fill="none" stroke="#00ff88" strokeWidth={0.6} strokeOpacity={0.3}
-                className="nav-ship-ring"/>
-              <line x1={ship[0]-9} y1={ship[1]} x2={ship[0]+9} y2={ship[1]}
-                stroke="#00ff88" strokeWidth={0.8}/>
-              <line x1={ship[0]} y1={ship[1]-9} x2={ship[0]} y2={ship[1]+9}
-                stroke="#00ff88" strokeWidth={0.8}/>
-              <circle cx={ship[0]} cy={ship[1]} r={1.8} fill="#00ff88" className="nav-ship-dot"/>
-              <text x={ship[0]+12} y={ship[1]-5} className="nav-ship-label">
-                YOU ARE HERE
-              </text>
-            </g>
+          {/* Result below map */}
+          {solved && (
+            <div className="nav-result">
+              <div className="nav-result-coord terminal-text">
+                POSITION CONFIRMED: {gridRef(ship)}
+              </div>
+              <div className="nav-result-sub terminal-text">
+                {scanLabel.includes('COARSE')
+                  ? 'COARSE FIX ACQUIRED — NARROWING TO FINE RESOLUTION...'
+                  : 'PRECISE FIX ACQUIRED — ATTITUDE ALIGNMENT REQUIRED'}
+              </div>
+            </div>
           )}
-        </svg>
-
-        {/* Result below map */}
-        {solved && (
-          <div className="nav-result">
-            <div className="nav-result-coord terminal-text">
-              POSITION CONFIRMED: {gridRef(ship)}
-            </div>
-            <div className="nav-result-sub terminal-text">
-              {scanLabel.includes('COARSE')
-                ? 'COARSE FIX ACQUIRED — NARROWING TO FINE RESOLUTION...'
-                : 'PRECISE FIX ACQUIRED — ATTITUDE ALIGNMENT REQUIRED'}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ── Right panel: catalog + signals + button ── */}
-      <div className="nav-panel">
-        {/* Pulsar reference catalog */}
-        <div className="nav-catalog">
-          <div className="nav-section-label terminal-text">// PULSAR REFERENCE CATALOG</div>
-          <table className="nav-table">
-            <thead>
-              <tr>
-                <th className="terminal-text">DESIGNATOR</th>
-                <th className="terminal-text">PERIOD (s)</th>
-                <th className="terminal-text">GRID</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pulsars.map(p => {
-                const matched = signals.find(s => selections[s.id] === p.id)
-                return (
-                  <tr key={p.id} style={matched ? { color: matched.color } : {}}>
-                    <td className="terminal-text">{p.id}</td>
-                    <td className="terminal-text">{p.period}</td>
-                    <td className="terminal-text">{gridRef(p.pos)}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
         </div>
 
-        {/* Intercepted signals */}
-        <div className="nav-signals">
-          <div className="nav-section-label terminal-text">// INTERCEPTED SIGNALS</div>
+        {/* Pulsar reference catalog */}
+        <div className="nav-catalog-side">
+          <div className="nav-catalog">
+            <div className="nav-section-label terminal-text">// PULSAR REFERENCE CATALOG</div>
+            <table className="nav-table">
+              <thead>
+                <tr>
+                  <th className="terminal-text">DESIGNATOR</th>
+                  <th className="terminal-text">PERIOD (s)</th>
+                  <th className="terminal-text">GRID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pulsars.map(p => {
+                  const matched = signals.find(s => selections[s.id] === p.id)
+                  return (
+                    <tr key={p.id} style={matched ? { color: matched.color } : {}}>
+                      <td className="terminal-text">{p.id}</td>
+                      <td className="terminal-text">{p.period}</td>
+                      <td className="terminal-text">{gridRef(p.pos)}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>{/* end nav-top-row */}
+
+      {/* ── Bottom bar: intercepted signals (horizontal) + button ── */}
+      <div className="nav-signals-bar">
+        <div className="nav-section-label terminal-text">// INTERCEPTED SIGNALS</div>
+        <div className="nav-signals-row">
           {signals.map(sig => (
             <div key={sig.id} className="nav-signal">
               <div className="nav-signal-top">
@@ -298,6 +304,7 @@ function TriSection({ pulsars, signals, ship, scanLabel, onComplete }) {
           </button>
         )}
       </div>
+
     </div>
   )
 }

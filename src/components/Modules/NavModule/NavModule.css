@@ -108,12 +108,52 @@
   animation: none;
 }
 
-/* ── Body (map left, panel right) ── */
+/* ── Body — column: top row (map+catalog) above signals bar ── */
 .nav-body {
   display: flex;
+  flex-direction: column;
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  gap: 0;
+}
+
+/* Top row: map on the left, catalog on the right */
+.nav-top-row {
+  display: flex;
+  flex-shrink: 0;
+  border-bottom: 1px solid #111820;
+}
+
+/* Catalog side panel (right of map in top row) */
+.nav-catalog-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 10px;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* Bottom: signals laid out horizontally + button below */
+.nav-signals-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px 10px;
+  flex-shrink: 0;
+}
+
+.nav-signals-row {
+  display: flex;
+  gap: 6px;
+}
+
+/* Signal cards in the horizontal row each take equal width */
+.nav-signals-row .nav-signal {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
 }
 
 /* ── Star Map ── */
