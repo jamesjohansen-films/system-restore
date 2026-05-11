@@ -63,17 +63,24 @@
   display: flex;
   flex: 1;
   min-height: 0;
+  position: relative; /* log text overlays the blank space */
 }
 
-/* Left column: circuit label + log text (no background/border) */
+/* Log text floats over the blank area — not in the flex flow,
+   so pm-arena gets full width and centers the grid properly */
 .pm-circuit-left {
-  width: 260px;
-  flex-shrink: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 250px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding-right: 8px;
   overflow: hidden;
+  pointer-events: none; /* let pointer events pass through to grid if overlap */
+  z-index: 1;
 }
 
 /* Log text sits directly in the blank space — no box */
