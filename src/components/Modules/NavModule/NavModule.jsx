@@ -93,7 +93,7 @@ function dialDiff(val, tgt) {
 }
 
 // ── TriSection — reusable triangulation panel ─────────────────────────────────
-function TriSection({ pulsars, signals, ship, scanLabel, onComplete }) {
+function TriSection({ pulsars, signals, ship, scanLabel, onComplete, logSlot }) {
   const [selections,    setSelections]    = useState(Object.fromEntries(signals.map(s=>[s.id,''])))
   const [triangulating, setTriangulating] = useState(false)
   const [showCircles,   setShowCircles]   = useState(false)
@@ -305,6 +305,13 @@ function TriSection({ pulsars, signals, ship, scanLabel, onComplete }) {
           </button>
         )}
       </div>
+
+      {/* ── Log fills remaining space below signals ── */}
+      {logSlot && (
+        <div className="nav-log-area">
+          {logSlot}
+        </div>
+      )}
 
     </div>
   )
@@ -621,6 +628,15 @@ export default function NavModule({ onSolve, onBack }) {
           ship={SHIP_A}
           scanLabel="// SECTOR SCAN — COARSE RESOLUTION — 300 PARSEC RANGE"
           onComplete={handleTriASolve}
+          logSlot={
+            <div key="day22" className="crew-log-entry">
+              <div className="crew-log-meta">
+                <span className="terminal-text crew-log-who">◈ LOG — VASQUEZ</span>
+                <span className="terminal-text crew-log-day">MISSION DAY 22</span>
+              </div>
+              <p className="terminal-text crew-log-text">Small course deviation. Not instrument error. We are being pulled toward coordinates that are not in our mission plan. Kepler-442b.</p>
+            </div>
+          }
         />
       )}
 
@@ -633,6 +649,15 @@ export default function NavModule({ onSolve, onBack }) {
           ship={SHIP_B}
           scanLabel="// SECTOR SCAN — FINE RESOLUTION — 60 PARSEC RANGE"
           onComplete={handleTriBSolve}
+          logSlot={
+            <div key="day22-later" className="crew-log-entry">
+              <div className="crew-log-meta">
+                <span className="terminal-text crew-log-who">◈ LOG — VASQUEZ</span>
+                <span className="terminal-text crew-log-day">DAY 22 — LATER</span>
+              </div>
+              <p className="terminal-text crew-log-text">The deviation started the exact same day as the power spike in LAB-07. That is not a coincidence. I have not told the others yet.</p>
+            </div>
+          }
         />
       )}
 
@@ -640,35 +665,6 @@ export default function NavModule({ onSolve, onBack }) {
       {!transitioning && phase === 'dials' && (
         <ShipAlignment3D onComplete={handleDialsSolve} />
       )}
-
-      {/* ── Crew log — one entry at a time, most recent wins ── */}
-      <div className="crew-log-strip" style={{flexShrink: 0, paddingTop: '5px', marginTop: '4px'}}>
-        {phase === 'dials' ? (
-          <div key="day23" className="crew-log-entry crew-log-entry--prometheus">
-            <div className="crew-log-meta">
-              <span className="terminal-text crew-log-who crew-log-who--prometheus">◈ LOG — VASQUEZ</span>
-              <span className="terminal-text crew-log-day crew-log-day--prometheus">MISSION DAY 23</span>
-            </div>
-            <p className="terminal-text crew-log-text crew-log-text--prometheus">Hayes confronted the Prometheus team today. It did not go well. I have locked the nav archives. Someone needs to know where we were going.</p>
-          </div>
-        ) : (phase === 'tri2' || transitioning) ? (
-          <div key="day22-later" className="crew-log-entry">
-            <div className="crew-log-meta">
-              <span className="terminal-text crew-log-who">◈ LOG — VASQUEZ</span>
-              <span className="terminal-text crew-log-day">DAY 22 — LATER</span>
-            </div>
-            <p className="terminal-text crew-log-text">The deviation started the exact same day as the power spike in LAB-07. That is not a coincidence. I have not told the others yet.</p>
-          </div>
-        ) : (
-          <div key="day22" className="crew-log-entry">
-            <div className="crew-log-meta">
-              <span className="terminal-text crew-log-who">◈ LOG — VASQUEZ</span>
-              <span className="terminal-text crew-log-day">MISSION DAY 22</span>
-            </div>
-            <p className="terminal-text crew-log-text">Small course deviation. Not instrument error. We are being pulled toward coordinates that are not in our mission plan. Kepler-442b.</p>
-          </div>
-        )}
-      </div>
 
     </div>
   )

@@ -149,6 +149,29 @@
   gap: 6px;
 }
 
+/* Log fills the remaining vertical space below the signals bar */
+.nav-log-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 10px 10px 14px;
+  border-top: 1px solid #0d0d0d;
+  overflow: hidden;
+}
+
+.nav-log-area .crew-log-entry {
+  border-left: none;
+  padding: 0;
+  gap: 5px;
+  animation: nav-fade-in 0.5s ease-out;
+}
+
+.nav-log-area .crew-log-who { font-size: 0.82rem; }
+.nav-log-area .crew-log-day { font-size: 0.72rem; margin-left: 0; }
+.nav-log-area .crew-log-text { font-size: 0.92rem; line-height: 1.75; }
+
 /* Signal cards in the horizontal row each take equal width */
 .nav-signals-row .nav-signal {
   flex: 1;
