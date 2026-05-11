@@ -548,24 +548,26 @@ export default function PowerModule({ onSolve, onBack }) {
           ✓ POWER GRID RESTORED — ALL CIRCUITS ONLINE
         </p>
         {showFragment && (
-          <div className="pm-fragment">
-            <p className="terminal-text pm-fragment__label">◈ MEMORY FRAGMENT 01 RECOVERED</p>
-            <div className="pm-fragment__data">
-              <span className="terminal-text">TIMESTAMP:&nbsp;</span>
-              <span className="terminal-text pm-fragment__value">2387.089 — 14:22:07</span>
-            </div>
-            <div className="pm-fragment__data">
-              <span className="terminal-text">EVENT:&nbsp;</span>
-              <span className="terminal-text pm-fragment__value">POWER LOSS — ORIGIN UNKNOWN — ALL SECTORS</span>
-            </div>
-            <div className="pm-fragment__data">
-              <span className="terminal-text">STATUS:&nbsp;</span>
-              <span className="terminal-text pm-fragment__value">ONLINE</span>
+          <>
+            <div className="pm-fragment">
+              <p className="terminal-text pm-fragment__label">◈ MEMORY FRAGMENT 01 RECOVERED</p>
+              <div className="pm-fragment__data">
+                <span className="terminal-text pm-fragment__key">TIMESTAMP:</span>
+                <span className="terminal-text pm-fragment__value">2387.089 — 14:22:07</span>
+              </div>
+              <div className="pm-fragment__data">
+                <span className="terminal-text pm-fragment__key">EVENT:</span>
+                <span className="terminal-text pm-fragment__value">POWER LOSS — ORIGIN UNKNOWN — ALL SECTORS</span>
+              </div>
+              <div className="pm-fragment__data">
+                <span className="terminal-text pm-fragment__key">STATUS:</span>
+                <span className="terminal-text pm-fragment__value">ONLINE</span>
+              </div>
             </div>
             <button className="pm-confirm terminal-text" onClick={() => onSolve('ONLINE')}>
               INTEGRATE FRAGMENT → CONTINUE
             </button>
-          </div>
+          </>
         )}
       </div>
     </div>
