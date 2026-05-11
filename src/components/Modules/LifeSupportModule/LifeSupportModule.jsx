@@ -361,22 +361,23 @@ export default function LifeSupportModule({ onSolve, onBack }) {
             {scanning ? '[ ANALYZING... ]' : '[ SUBMIT SPECTRAL ANALYSIS ]'}
           </button>
 
-          {/* ── Crew log ── */}
+          {/* ── Crew log — one entry at a time, most recent wins ── */}
           <div className="crew-log-strip">
-            <div className="crew-log-entry">
-              <div className="crew-log-meta">
-                <span className="terminal-text crew-log-who">◈ LOG — KOWALSKI</span>
-                <span className="terminal-text crew-log-day">MISSION DAY 24</span>
-              </div>
-              <p className="terminal-text crew-log-text">Vitagen-7 mutation rate has exceeded all projections. The compound is no longer stable. I should report this. I am not sure I should.</p>
-            </div>
-            {roundIdx >= 1 && (
-              <div className="crew-log-entry">
+            {roundIdx >= 1 ? (
+              <div key="day25" className="crew-log-entry">
                 <div className="crew-log-meta">
                   <span className="terminal-text crew-log-who">◈ LOG — KOWALSKI</span>
                   <span className="terminal-text crew-log-day">MISSION DAY 25</span>
                 </div>
                 <p className="terminal-text crew-log-text">Hayes is gone. Chen is not responding. The Prometheus team triggered this. I know it. I cannot prove it.</p>
+              </div>
+            ) : (
+              <div key="day24" className="crew-log-entry">
+                <div className="crew-log-meta">
+                  <span className="terminal-text crew-log-who">◈ LOG — KOWALSKI</span>
+                  <span className="terminal-text crew-log-day">MISSION DAY 24</span>
+                </div>
+                <p className="terminal-text crew-log-text">Vitagen-7 mutation rate has exceeded all projections. The compound is no longer stable. I should report this. I am not sure I should.</p>
               </div>
             )}
           </div>

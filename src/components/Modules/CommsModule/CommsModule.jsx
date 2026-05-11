@@ -263,31 +263,31 @@ export default function CommsModule({ onSolve, onBack }) {
             </div>
           )}
 
-          {/* ── Crew log ── */}
+          {/* ── Crew log — one entry at a time, most recent wins ── */}
           <div className="crew-log-strip" style={{marginTop: 'auto', paddingTop: '6px'}}>
-            <div className="crew-log-entry">
-              <div className="crew-log-meta">
-                <span className="terminal-text crew-log-who">◈ LOG — CHEN</span>
-                <span className="terminal-text crew-log-day">MISSION DAY 18</span>
+            {solved ? (
+              <div key="prometheus" className="crew-log-entry crew-log-entry--prometheus">
+                <div className="crew-log-meta">
+                  <span className="terminal-text crew-log-who crew-log-who--prometheus">◈ PROMETHEUS HQ — RECOVERED</span>
+                  <span className="terminal-text crew-log-day crew-log-day--prometheus">DAY 19</span>
+                </div>
+                <p className="terminal-text crew-log-text crew-log-text--prometheus">All crew logs reviewed before Earth relay. Crew awareness of Vitagen-7 scope is unacceptable. Initiate containment protocol.</p>
               </div>
-              <p className="terminal-text crew-log-text">Irregular packet drops in the outgoing data stream. Thought it was solar interference. It is not. Someone is filtering our transmissions.</p>
-            </div>
-            {lockedFlags.filter(Boolean).length >= 2 && (
-              <div className="crew-log-entry">
+            ) : lockedFlags.filter(Boolean).length >= 2 ? (
+              <div key="day19" className="crew-log-entry">
                 <div className="crew-log-meta">
                   <span className="terminal-text crew-log-who">◈ LOG — CHEN</span>
                   <span className="terminal-text crew-log-day">MISSION DAY 19</span>
                 </div>
                 <p className="terminal-text crew-log-text">The filter is using corporate-grade encryption. Our messages home are being read before they leave the ship.</p>
               </div>
-            )}
-            {solved && (
-              <div className="crew-log-entry crew-log-entry--prometheus">
+            ) : (
+              <div key="day18" className="crew-log-entry">
                 <div className="crew-log-meta">
-                  <span className="terminal-text crew-log-who crew-log-who--prometheus">◈ PROMETHEUS HQ — RECOVERED</span>
-                  <span className="terminal-text crew-log-day crew-log-day--prometheus">DAY 19</span>
+                  <span className="terminal-text crew-log-who">◈ LOG — CHEN</span>
+                  <span className="terminal-text crew-log-day">MISSION DAY 18</span>
                 </div>
-                <p className="terminal-text crew-log-text crew-log-text--prometheus">All crew logs reviewed before Earth relay. Crew awareness of Vitagen-7 scope is unacceptable. Initiate containment protocol.</p>
+                <p className="terminal-text crew-log-text">Irregular packet drops in the outgoing data stream. Thought it was solar interference. It is not. Someone is filtering our transmissions.</p>
               </div>
             )}
           </div>
