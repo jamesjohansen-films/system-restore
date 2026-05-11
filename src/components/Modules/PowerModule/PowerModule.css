@@ -101,12 +101,14 @@
 .pm-circuit-log .crew-log-text { font-size: 1.15rem; line-height: 1.8; }
 
 /* ── Arena — square grid area ── */
+/* padding-left matches pm-circuit-left width so the grid never overlaps the log */
 .pm-arena {
   flex: 1;
   min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-left: 250px;
 }
 
 /* Square grid — height-constrained, 1:1 ratio */
