@@ -58,53 +58,40 @@
   flex-shrink: 0;
 }
 
-/* ── Content row: log panel (left) + puzzle (right) ── */
-.pm-content {
+/* ── Circuit two-column layout ── */
+.pm-circuit-row {
   display: flex;
   flex: 1;
   min-height: 0;
 }
 
-/* Log panel fills the full height beside the grid */
-.pm-log-col {
-  width: 270px;
+/* Left column: circuit label + log text (no background/border) */
+.pm-circuit-left {
+  width: 260px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #1a1a1a;
+  gap: 8px;
+  padding-right: 8px;
   overflow: hidden;
 }
 
-/* Entry stretches to fill the entire panel */
-.pm-log-col .crew-log-entry {
+/* Log text sits directly in the blank space — no box */
+.pm-circuit-log {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 14px 12px;
+  overflow: hidden;
+}
+
+.pm-circuit-log .crew-log-entry {
   border-left: none;
-  gap: 8px;
+  padding: 0;
+  gap: 5px;
   animation: nav-fade-in 0.5s ease-out;
 }
 
-.pm-log-col .crew-log-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.pm-log-col .crew-log-who  { font-size: 0.72rem; color: #3a5a3a; }
-.pm-log-col .crew-log-who--prometheus { color: #6a3030; }
-.pm-log-col .crew-log-day  { font-size: 0.65rem; color: #2a3a2a; margin-left: 0; }
-.pm-log-col .crew-log-day--prometheus { color: #3a2020; }
-.pm-log-col .crew-log-text { font-size: 0.75rem; line-height: 1.65; color: #4a5a4a; flex: 1; }
-.pm-log-col .crew-log-text--prometheus { color: #5a3535; }
-
-.pm-puzzle-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
+.pm-circuit-log .crew-log-who { font-size: 0.70rem; }
+.pm-circuit-log .crew-log-day { font-size: 0.63rem; margin-left: 0; }
+.pm-circuit-log .crew-log-text { font-size: 0.72rem; line-height: 1.6; }
 
 /* ── Arena — square grid area ── */
 .pm-arena {

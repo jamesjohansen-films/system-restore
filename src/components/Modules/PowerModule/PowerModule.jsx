@@ -166,7 +166,7 @@ function Screw({ turns, onClick, removed }) {
 }
 
 // ── Flow puzzle renderer (shared across all 3 circuits) ────────────────────────
-function FlowPuzzle({ puzzle, G, colorKeys, onCircuitSolve, circuitLabel }) {
+function FlowPuzzle({ puzzle, G, colorKeys, onCircuitSolve, circuitLabel, logSlot }) {
   const { endpoints, obs, obsTypes } = puzzle
   const epMap   = buildEpMap(endpoints)
   const [paths, setPaths] = useState({})
@@ -276,59 +276,67 @@ function FlowPuzzle({ puzzle, G, colorKeys, onCircuitSolve, circuitLabel }) {
 
   return (
     <div className="pm-circuit">
-      <div className="pm-circuit__label terminal-text">{circuitLabel}</div>
+      {/* ROUTED counter — full width so text-align:right keeps it far right */}
       <span className={`pm-counter terminal-text ${completedCount === colorKeys.length ? 'pm-counter--clear' : ''}`}>
         ROUTED: {completedCount} / {colorKeys.length}
       </span>
 
-      <div className="pm-arena">
-        <div
-          ref={gridRef}
-          className="pm-grid"
-          style={{ gridTemplateColumns: `repeat(${G}, 1fr)`, gridTemplateRows: `repeat(${G}, 1fr)` }}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-        >
-          {Array.from({ length: G * G }, (_, i) => {
-            const r = Math.floor(i / G), c = i % G
-            const ep  = epColor(r, c)
-            const ob  = isObs(r, c)
-            const obt = ob ? obsTypes[`${r},${c}`] : null
-            return (
-              <div
-                key={i}
-                className={`pm-cell ${ob ? `pm-cell--${obt}` : ''}`}
-                data-ep={ep || undefined}
-              >
-                {ep && (
-                  <div
-                    className="pm-dot"
-                    style={{ background: COLOR_HEX[ep], boxShadow: `0 0 8px ${COLOR_HEX[ep]}88` }}
-                  />
-                )}
-                {obt === 'blocker' && <div className="pm-blocker" />}
-              </div>
-            )
-          })}
+      {/* Two-column row: left = label + log text, right = grid */}
+      <div className="pm-circuit-row">
+        <div className="pm-circuit-left">
+          <div className="pm-circuit__label terminal-text">{circuitLabel}</div>
+          {logSlot && <div className="pm-circuit-log">{logSlot}</div>}
+        </div>
 
-          {/* SVG overlay */}
-          <svg className="pm-svg-overlay" viewBox={`0 0 ${G} ${G}`} preserveAspectRatio="none">
-            {svgPaths.map(({ col, path, hex }) => {
-              const pts = path.map(([r, c]) => `${c + 0.5},${r + 0.5}`).join(' ')
+        <div className="pm-arena">
+          <div
+            ref={gridRef}
+            className="pm-grid"
+            style={{ gridTemplateColumns: `repeat(${G}, 1fr)`, gridTemplateRows: `repeat(${G}, 1fr)` }}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+          >
+            {Array.from({ length: G * G }, (_, i) => {
+              const r = Math.floor(i / G), c = i % G
+              const ep  = epColor(r, c)
+              const ob  = isObs(r, c)
+              const obt = ob ? obsTypes[`${r},${c}`] : null
               return (
-                <g key={col}>
-                  {path.map(([r, c]) => (
-                    <rect key={`${r},${c}`} x={c} y={r} width={1} height={1}
-                      fill={hex} fillOpacity={0.18} />
-                  ))}
-                  <polyline points={pts} fill="none" stroke={hex}
-                    strokeWidth={0.32} strokeLinecap="round" strokeLinejoin="round"
-                    opacity={0.9} />
-                </g>
+                <div
+                  key={i}
+                  className={`pm-cell ${ob ? `pm-cell--${obt}` : ''}`}
+                  data-ep={ep || undefined}
+                >
+                  {ep && (
+                    <div
+                      className="pm-dot"
+                      style={{ background: COLOR_HEX[ep], boxShadow: `0 0 8px ${COLOR_HEX[ep]}88` }}
+                    />
+                  )}
+                  {obt === 'blocker' && <div className="pm-blocker" />}
+                </div>
               )
             })}
-          </svg>
+
+            {/* SVG overlay */}
+            <svg className="pm-svg-overlay" viewBox={`0 0 ${G} ${G}`} preserveAspectRatio="none">
+              {svgPaths.map(({ col, path, hex }) => {
+                const pts = path.map(([r, c]) => `${c + 0.5},${r + 0.5}`).join(' ')
+                return (
+                  <g key={col}>
+                    {path.map(([r, c]) => (
+                      <rect key={`${r},${c}`} x={c} y={r} width={1} height={1}
+                        fill={hex} fillOpacity={0.18} />
+                    ))}
+                    <polyline points={pts} fill="none" stroke={hex}
+                      strokeWidth={0.32} strokeLinecap="round" strokeLinejoin="round"
+                      opacity={0.9} />
+                  </g>
+                )
+              })}
+            </svg>
+          </div>
         </div>
       </div>
 
@@ -467,40 +475,31 @@ export default function PowerModule({ onSolve, onBack }) {
           CONNECT MATCHING CONDUIT NODES — AVOID BLOCKERS
         </p>
 
-        <div className="pm-content">
-          {/* ── Left: log panel — one entry fills full height, replaces on progress ── */}
-          <div className="pm-log-col">
-            {circuitIdx === 0 ? (
-              <div className="crew-log-entry">
-                <div className="crew-log-meta">
-                  <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-                  <span className="terminal-text crew-log-day">MISSION DAY 01</span>
-                </div>
-                <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule. Kowalski says it is routine calibration.</p>
+        <FlowPuzzle
+          key={circuitIdx}
+          puzzle={allPuzzles[circuitIdx]}
+          G={circuit.G}
+          colorKeys={circuit.colorKeys}
+          circuitLabel={circuit.label}
+          onCircuitSolve={sig => handleCircuitSolve(circuitIdx, sig)}
+          logSlot={circuitIdx === 0 ? (
+            <div className="crew-log-entry">
+              <div className="crew-log-meta">
+                <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+                <span className="terminal-text crew-log-day">MISSION DAY 01</span>
               </div>
-            ) : (
-              <div className="crew-log-entry">
-                <div className="crew-log-meta">
-                  <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-                  <span className="terminal-text crew-log-day">MISSION DAY 14</span>
-                </div>
-                <p className="terminal-text crew-log-text">Power draw from LAB-07 spiked overnight. 340% above mission spec. Filed a report. Prometheus HQ replied: "Do not escalate." I am escalating anyway.</p>
+              <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule. Kowalski says it is routine calibration.</p>
+            </div>
+          ) : (
+            <div className="crew-log-entry">
+              <div className="crew-log-meta">
+                <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+                <span className="terminal-text crew-log-day">MISSION DAY 14</span>
               </div>
-            )}
-          </div>
-
-          {/* ── Right: circuit puzzle ── */}
-          <div className="pm-puzzle-col">
-            <FlowPuzzle
-              key={circuitIdx}
-              puzzle={allPuzzles[circuitIdx]}
-              G={circuit.G}
-              colorKeys={circuit.colorKeys}
-              circuitLabel={circuit.label}
-              onCircuitSolve={sig => handleCircuitSolve(circuitIdx, sig)}
-            />
-          </div>
-        </div>
+              <p className="terminal-text crew-log-text">Power draw from LAB-07 spiked overnight. 340% above mission spec. Filed a report. Prometheus HQ replied: "Do not escalate." I am escalating anyway.</p>
+            </div>
+          )}
+        />
       </div>
     )
   }
