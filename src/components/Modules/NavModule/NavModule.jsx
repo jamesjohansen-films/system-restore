@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import useIdleHelp from '../../../hooks/useIdleHelp'
 import './NavModule.css'
 import TerminalSelect from '../../TerminalSelect/TerminalSelect'
 import HelpModal from '../../HelpModal/HelpModal'
@@ -542,7 +543,7 @@ function ShipAlignment3D({ onComplete }) {
 
 // ── Main NavModule ────────────────────────────────────────────────────────────
 export default function NavModule({ onSolve, onBack }) {
-  const [showHelp, setShowHelp] = useState(false)
+  const [showHelp, setShowHelp] = useIdleHelp(120_000)
 
   // 'tri1' | 'tri2' | 'dials' | 'done'
   const [phase,         setPhase]         = useState('tri1')

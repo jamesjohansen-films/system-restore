@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './CommsModule.css'
 import HelpModal from '../../HelpModal/HelpModal'
+import useIdleHelp from '../../../hooks/useIdleHelp'
 
 // ── Puzzle constants ───────────────────────────────────────────────────────────
 const TOLERANCE = 5   // ±5 on each 0-100 slider before a channel "locks"
@@ -40,7 +41,7 @@ function isLocked(ch, sl) {
 
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function CommsModule({ onSolve, onBack }) {
-  const [showHelp, setShowHelp] = useState(false)
+  const [showHelp, setShowHelp] = useIdleHelp(120_000)
 
   const [sliders, setSliders] = useState(() =>
     CHANNELS.map(() => ({ freq: 50, amp: 50 }))

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './LifeSupportModule.css'
 import HelpModal from '../../HelpModal/HelpModal'
+import useIdleHelp from '../../../hooks/useIdleHelp'
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 const NUM_COLS = 6
@@ -172,7 +173,7 @@ function FragStrip({ bars }) {
 
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function LifeSupportModule({ onSolve, onBack }) {
-  const [showHelp, setShowHelp] = useState(false)
+  const [showHelp, setShowHelp] = useIdleHelp(120_000)
 
   const [rounds] = useState(() =>
     ROUND_DATA.map(r => {

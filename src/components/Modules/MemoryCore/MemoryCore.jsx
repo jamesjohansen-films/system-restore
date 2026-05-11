@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import './MemoryCore.css'
 import HelpModal from '../../HelpModal/HelpModal'
+import useIdleHelp from '../../../hooks/useIdleHelp'
 
 // ── Fragment manifest ──────────────────────────────────────────────────────────
 const FRAGMENTS = [
@@ -68,7 +69,7 @@ function pad2(n) { return String(n).padStart(2, '0') }
 
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function MemoryCore({ onSolve, onBack }) {
-  const [showHelp, setShowHelp] = useState(false)
+  const [showHelp, setShowHelp] = useIdleHelp(120_000)
 
   // 'ready' | 'launching' | 'story' | 'countdown'
   const [phase,     setPhase]     = useState('ready')

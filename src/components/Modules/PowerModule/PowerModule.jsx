@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import './PowerModule.css'
 import HelpModal from '../../HelpModal/HelpModal'
+import useIdleHelp from '../../../hooks/useIdleHelp'
 
 // ── Colour palette ─────────────────────────────────────────────────────────────
 const COLOR_HEX = {
@@ -350,7 +351,7 @@ function FlowPuzzle({ puzzle, G, colorKeys, onCircuitSolve, circuitLabel, logSlo
 
 // ── Main PowerModule ───────────────────────────────────────────────────────────
 export default function PowerModule({ onSolve, onBack }) {
-  const [showHelp, setShowHelp] = useState(false)
+  const [showHelp, setShowHelp] = useIdleHelp(120_000)
 
   // Generate all 3 puzzles once
   const [allPuzzles] = useState(() => CIRCUITS.map(c => generatePuzzle(c)))
