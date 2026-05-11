@@ -404,53 +404,38 @@ export default function PowerModule({ onSolve, onBack }) {
 
         <button className="dev-skip-btn" onClick={devSkip}>⚡ DEV SKIP</button>
 
-        <div className="pm-content">
-          {/* ── Left: crew log ── */}
-          <div className="pm-log-col">
-            <div className="crew-log-entry">
-              <div className="crew-log-meta">
-                <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-                <span className="terminal-text crew-log-day">MISSION DAY 01</span>
-              </div>
-              <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule. Kowalski says it is routine calibration.</p>
-            </div>
-          </div>
+        {/* No log during screws — full width panel */}
+        <div className="pm-panel-wrap">
+          <svg className="pm-panel-svg" viewBox="0 0 300 260">
+            {/* Panel body */}
+            <rect x={10} y={10} width={280} height={240} rx={4}
+              fill="#0a0a0a" stroke="#1e1e1e" strokeWidth={2} />
+            {/* Warning stripes */}
+            <rect x={10} y={10} width={280} height={16} fill="#111" />
+            <rect x={10} y={234} width={280} height={16} fill="#111" />
+            {/* Label */}
+            <text x={150} y={140} textAnchor="middle"
+              className="pm-panel-text">POWER DISTRIBUTION PANEL</text>
+            <text x={150} y={158} textAnchor="middle"
+              className="pm-panel-subtext">ACCESS RESTRICTED — REMOVE PANEL COVER TO PROCEED</text>
+            {/* Decorative lines */}
+            <line x1={60} y1={125} x2={100} y2={125} stroke="#1e1e1e" strokeWidth={1}/>
+            <line x1={200} y1={125} x2={240} y2={125} stroke="#1e1e1e" strokeWidth={1}/>
 
-          {/* ── Right: screw panel ── */}
-          <div className="pm-puzzle-col">
-            <div className="pm-panel-wrap">
-              <svg className="pm-panel-svg" viewBox="0 0 300 260">
-                {/* Panel body */}
-                <rect x={10} y={10} width={280} height={240} rx={4}
-                  fill="#0a0a0a" stroke="#1e1e1e" strokeWidth={2} />
-                {/* Warning stripes */}
-                <rect x={10} y={10} width={280} height={16} fill="#111" />
-                <rect x={10} y={234} width={280} height={16} fill="#111" />
-                {/* Label */}
-                <text x={150} y={140} textAnchor="middle"
-                  className="pm-panel-text">POWER DISTRIBUTION PANEL</text>
-                <text x={150} y={158} textAnchor="middle"
-                  className="pm-panel-subtext">ACCESS RESTRICTED — REMOVE PANEL COVER TO PROCEED</text>
-                {/* Decorative lines */}
-                <line x1={60} y1={125} x2={100} y2={125} stroke="#1e1e1e" strokeWidth={1}/>
-                <line x1={200} y1={125} x2={240} y2={125} stroke="#1e1e1e" strokeWidth={1}/>
-
-                {/* Screws */}
-                {screwPositions.map((pos, i) => (
-                  <g key={i} transform={`translate(${pos.cx},${pos.cy})`}>
-                    <Screw
-                      turns={screws[i]}
-                      removed={screws[i] >= CLICKS_TO_REMOVE}
-                      onClick={() => clickScrew(i)}
-                    />
-                  </g>
-                ))}
-              </svg>
-              <p className="pm-hint terminal-text terminal-text--dim">
-                CLICK EACH SCREW TO UNTHREAD — REMOVE ALL {SCREWS_COUNT} SCREWS TO ACCESS PANEL
-              </p>
-            </div>
-          </div>
+            {/* Screws */}
+            {screwPositions.map((pos, i) => (
+              <g key={i} transform={`translate(${pos.cx},${pos.cy})`}>
+                <Screw
+                  turns={screws[i]}
+                  removed={screws[i] >= CLICKS_TO_REMOVE}
+                  onClick={() => clickScrew(i)}
+                />
+              </g>
+            ))}
+          </svg>
+          <p className="pm-hint terminal-text terminal-text--dim">
+            CLICK EACH SCREW TO UNTHREAD — REMOVE ALL {SCREWS_COUNT} SCREWS TO ACCESS PANEL
+          </p>
         </div>
       </div>
     )
@@ -471,22 +456,25 @@ export default function PowerModule({ onSolve, onBack }) {
         <button className="dev-skip-btn" onClick={devSkip}>⚡ DEV SKIP</button>
 
         <div className="pm-content">
-          {/* ── Left: crew log ── */}
+          {/* ── Left: single log entry — replaces as circuits progress ── */}
           <div className="pm-log-col">
-            <div className="crew-log-entry">
-              <div className="crew-log-meta">
-                <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-                <span className="terminal-text crew-log-day">MISSION DAY 01</span>
+            {circuitIdx === 0 ? (
+              <div className="crew-log-entry">
+                <div className="crew-log-meta">
+                  <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+                  <span className="terminal-text crew-log-day">MISSION DAY 01</span>
+                </div>
+                <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule. Kowalski says it is routine calibration.</p>
               </div>
-              <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule.</p>
-            </div>
-            <div className="crew-log-entry">
-              <div className="crew-log-meta">
-                <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-                <span className="terminal-text crew-log-day">MISSION DAY 14</span>
+            ) : (
+              <div className="crew-log-entry">
+                <div className="crew-log-meta">
+                  <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+                  <span className="terminal-text crew-log-day">MISSION DAY 14</span>
+                </div>
+                <p className="terminal-text crew-log-text">Power draw from LAB-07 spiked overnight. 340% above mission spec. Filed a report. Prometheus HQ replied: "Do not escalate." I am escalating anyway.</p>
               </div>
-              <p className="terminal-text crew-log-text">Power draw from LAB-07 spiked overnight. 340% above mission spec. Filed a report. Prometheus HQ replied: "Do not escalate." I am escalating anyway.</p>
-            </div>
+            )}
           </div>
 
           {/* ── Right: circuit puzzle ── */}
@@ -516,22 +504,8 @@ export default function PowerModule({ onSolve, onBack }) {
         <span className="pm-title terminal-text">MODULE 01 — POWER GRID</span>
       </div>
       <div className="pm-content">
-        {/* ── Left: crew log ── */}
+        {/* ── Left: final log entry — Prometheus intercept replaces Hayes ── */}
         <div className="pm-log-col">
-          <div className="crew-log-entry">
-            <div className="crew-log-meta">
-              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-              <span className="terminal-text crew-log-day">MISSION DAY 01</span>
-            </div>
-            <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule.</p>
-          </div>
-          <div className="crew-log-entry">
-            <div className="crew-log-meta">
-              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-              <span className="terminal-text crew-log-day">MISSION DAY 14</span>
-            </div>
-            <p className="terminal-text crew-log-text">Power draw from LAB-07 spiked 340% above mission spec. Filed a report. Prometheus HQ: "Do not escalate."</p>
-          </div>
           <div className="crew-log-entry crew-log-entry--prometheus">
             <div className="crew-log-meta">
               <span className="terminal-text crew-log-who crew-log-who--prometheus">◈ PROMETHEUS INTERNAL — RECOVERED</span>
