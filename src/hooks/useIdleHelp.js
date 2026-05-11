@@ -4,24 +4,21 @@ import { useState, useEffect, useRef, useCallback } from 'react'
  * Shows the help modal automatically after `delayMs` of user inactivity.
  * Returns [showHelp, setShowHelp] — drop-in replacement for useState(false).
  *
- * The timer resets on any mouse move, click, keypress, touch, or scroll.
- * While the modal is open the timer is paused; it restarts on close.
+ * The timer fires at most ONCE per puzzle (module mount). After it triggers,
+ * all event listeners are removed and the timer never runs again for that module.
  */
 export default function useIdleHelp(delayMs = 120_000) {
   const [showHelp, setShowHelp] = useState(false)
-  const timerRef   = useRef(null)
-  const isOpenRef  = useRef(false)   // avoids stale closure in event callbacks
-
-  // Keep the ref in sync so reset() can read the latest value without
-  // being re-created (and re-attached) every time showHelp changes.
-  useEffect(() => {
-    isOpenRef.current = showHelp
-  }, [showHelp])
+  const timerRef  = useRef(null)
+  const firedRef  = useRef(false)   // true once the auto-open has happened
 
   const reset = useCallback(() => {
-    if (isOpenRef.current) return   // don't restart while modal is visible
+    if (firedRef.current) return    // already fired — never trigger again
     clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => setShowHelp(true), delayMs)
+    timerRef.current = setTimeout(() => {
+      firedRef.current = true       // mark as fired before opening
+      setShowHelp(true)
+    }, delayMs)
   }, [delayMs])
 
   useEffect(() => {
