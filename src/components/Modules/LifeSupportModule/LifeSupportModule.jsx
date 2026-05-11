@@ -275,8 +275,10 @@ export default function LifeSupportModule({ onSolve, onBack }) {
 
       {/* Header */}
       <div className="ls-header">
-        <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
-        <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
+        <div className="pm-header-left">
+          <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
+          <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
+        </div>
         <span className="pm-title terminal-text">MODULE 04 — LIFE SUPPORT</span>
         <span className={`ls-status terminal-text
           ${solved   ? 'ls-status--restored' : ''}

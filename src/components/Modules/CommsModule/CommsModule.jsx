@@ -99,8 +99,10 @@ export default function CommsModule({ onSolve, onBack }) {
 
       {/* ── Header ── */}
       <div className="comms-module__header">
-        <button className="cm-back terminal-text" onClick={onBack}>← BACK</button>
-        <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
+        <div className="pm-header-left">
+          <button className="cm-back terminal-text" onClick={onBack}>← BACK</button>
+          <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
+        </div>
         <span className="cm-title terminal-text">MODULE 02 — COMMUNICATIONS</span>
         <span className={`cm-status terminal-text ${solved ? 'cm-status--online' : ''}`}>
           {solved ? '✓ ONLINE' : '— OFFLINE'}

@@ -595,8 +595,10 @@ export default function NavModule({ onSolve, onBack }) {
 
       {/* ── Header ── */}
       <div className="nav-header">
-        <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
-        <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
+        <div className="pm-header-left">
+          <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
+          <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
+        </div>
         <span className="pm-title terminal-text">MODULE 03 — NAVIGATION</span>
         <span className={`nav-status terminal-text ${statusLocked ? 'nav-status--locked' : ''}`}>
           {status}

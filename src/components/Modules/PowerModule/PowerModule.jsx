@@ -416,8 +416,10 @@ export default function PowerModule({ onSolve, onBack }) {
           onClose={() => setShowHelp(false)}
         />}
         <div className="power-module__header">
-          <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
-          <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
+          <div className="pm-header-left">
+            <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
+            <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
+          </div>
           <span className="pm-title terminal-text">MODULE 01 — POWER GRID</span>
           <span className="pm-counter terminal-text">
             SCREWS REMOVED: {screws.filter(n => n >= CLICKS_TO_REMOVE).length} / {SCREWS_COUNT}
@@ -478,8 +480,10 @@ export default function PowerModule({ onSolve, onBack }) {
           onClose={() => setShowHelp(false)}
         />}
         <div className="power-module__header">
-          <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
-          <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
+          <div className="pm-header-left">
+            <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
+            <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
+          </div>
           <span className="pm-title terminal-text">MODULE 01 — POWER GRID</span>
           <span className="pm-counter terminal-text">
             CIRCUIT: {circuitIdx + 1} / {CIRCUITS.length}
@@ -533,8 +537,10 @@ export default function PowerModule({ onSolve, onBack }) {
         onClose={() => setShowHelp(false)}
       />}
       <div className="power-module__header">
-        <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
-        <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
+        <div className="pm-header-left">
+          <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
+          <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
+        </div>
         <span className="pm-title terminal-text">MODULE 01 — POWER GRID</span>
       </div>
       <div className="pm-solved">

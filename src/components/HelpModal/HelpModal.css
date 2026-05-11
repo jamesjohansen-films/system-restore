@@ -88,6 +88,13 @@
   color: var(--color-text-primary);
 }
 
+/* ── Header left group — keeps ← BACK and [ ? ] pinned together ── */
+.pm-header-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 /* ── Help button — shared across all module headers ── */
 .help-btn {
   background: none;
@@ -105,4 +112,10 @@
 .help-btn:hover {
   color: var(--color-text-primary);
   border-color: #505050;
+}
+
+.help-btn:active {
+  transform: scale(0.93);
+  color: var(--color-text-primary);
+  border-color: #606060;
 }
