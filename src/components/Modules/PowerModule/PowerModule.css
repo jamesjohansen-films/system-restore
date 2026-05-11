@@ -96,17 +96,21 @@
   animation: nav-fade-in 0.5s ease-out;
 }
 
-.pm-circuit-log .crew-log-who { font-size: 1.0rem; }
-.pm-circuit-log .crew-log-day { font-size: 0.88rem; margin-left: 0; }
-.pm-circuit-log .crew-log-text { font-size: 1.15rem; line-height: 1.8; }
+.pm-circuit-log .crew-log-who { font-size: 0.82rem; }
+.pm-circuit-log .crew-log-day { font-size: 0.72rem; margin-left: 0; }
+.pm-circuit-log .crew-log-text { font-size: 0.92rem; line-height: 1.75; }
 
 /* ── Arena — square grid area ── */
+/* Equal padding both sides keeps the grid center at W/2 while
+   preventing the grid from ever reaching the absolute-positioned log */
 .pm-arena {
   flex: 1;
   min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-left: 250px;
+  padding-right: 250px;
 }
 
 /* Square grid — height-constrained, 1:1 ratio */
