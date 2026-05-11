@@ -403,47 +403,53 @@ export default function PowerModule({ onSolve, onBack }) {
         </div>
 
         <button className="dev-skip-btn" onClick={devSkip}>⚡ DEV SKIP</button>
-        <div className="pm-panel-wrap">
-          <svg className="pm-panel-svg" viewBox="0 0 300 260">
-            {/* Panel body */}
-            <rect x={10} y={10} width={280} height={240} rx={4}
-              fill="#0a0a0a" stroke="#1e1e1e" strokeWidth={2} />
-            {/* Warning stripes */}
-            <rect x={10} y={10} width={280} height={16} fill="#111" />
-            <rect x={10} y={234} width={280} height={16} fill="#111" />
-            {/* Label */}
-            <text x={150} y={140} textAnchor="middle"
-              className="pm-panel-text">POWER DISTRIBUTION PANEL</text>
-            <text x={150} y={158} textAnchor="middle"
-              className="pm-panel-subtext">ACCESS RESTRICTED — REMOVE PANEL COVER TO PROCEED</text>
-            {/* Decorative lines */}
-            <line x1={60} y1={125} x2={100} y2={125} stroke="#1e1e1e" strokeWidth={1}/>
-            <line x1={200} y1={125} x2={240} y2={125} stroke="#1e1e1e" strokeWidth={1}/>
 
-            {/* Screws */}
-            {screwPositions.map((pos, i) => (
-              <g key={i} transform={`translate(${pos.cx},${pos.cy})`}>
-                <Screw
-                  turns={screws[i]}
-                  removed={screws[i] >= CLICKS_TO_REMOVE}
-                  onClick={() => clickScrew(i)}
-                />
-              </g>
-            ))}
-          </svg>
-          <p className="pm-hint terminal-text terminal-text--dim">
-            CLICK EACH SCREW TO UNTHREAD — REMOVE ALL {SCREWS_COUNT} SCREWS TO ACCESS PANEL
-          </p>
-        </div>
-
-        {/* ── Crew log ── */}
-        <div className="crew-log-strip">
-          <div className="crew-log-entry">
-            <div className="crew-log-meta">
-              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-              <span className="terminal-text crew-log-day">MISSION DAY 01</span>
+        <div className="pm-content">
+          {/* ── Left: crew log ── */}
+          <div className="pm-log-col">
+            <div className="crew-log-entry">
+              <div className="crew-log-meta">
+                <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+                <span className="terminal-text crew-log-day">MISSION DAY 01</span>
+              </div>
+              <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule. Kowalski says it is routine calibration.</p>
             </div>
-            <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule. Kowalski says it is routine calibration.</p>
+          </div>
+
+          {/* ── Right: screw panel ── */}
+          <div className="pm-puzzle-col">
+            <div className="pm-panel-wrap">
+              <svg className="pm-panel-svg" viewBox="0 0 300 260">
+                {/* Panel body */}
+                <rect x={10} y={10} width={280} height={240} rx={4}
+                  fill="#0a0a0a" stroke="#1e1e1e" strokeWidth={2} />
+                {/* Warning stripes */}
+                <rect x={10} y={10} width={280} height={16} fill="#111" />
+                <rect x={10} y={234} width={280} height={16} fill="#111" />
+                {/* Label */}
+                <text x={150} y={140} textAnchor="middle"
+                  className="pm-panel-text">POWER DISTRIBUTION PANEL</text>
+                <text x={150} y={158} textAnchor="middle"
+                  className="pm-panel-subtext">ACCESS RESTRICTED — REMOVE PANEL COVER TO PROCEED</text>
+                {/* Decorative lines */}
+                <line x1={60} y1={125} x2={100} y2={125} stroke="#1e1e1e" strokeWidth={1}/>
+                <line x1={200} y1={125} x2={240} y2={125} stroke="#1e1e1e" strokeWidth={1}/>
+
+                {/* Screws */}
+                {screwPositions.map((pos, i) => (
+                  <g key={i} transform={`translate(${pos.cx},${pos.cy})`}>
+                    <Screw
+                      turns={screws[i]}
+                      removed={screws[i] >= CLICKS_TO_REMOVE}
+                      onClick={() => clickScrew(i)}
+                    />
+                  </g>
+                ))}
+              </svg>
+              <p className="pm-hint terminal-text terminal-text--dim">
+                CLICK EACH SCREW TO UNTHREAD — REMOVE ALL {SCREWS_COUNT} SCREWS TO ACCESS PANEL
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -463,33 +469,39 @@ export default function PowerModule({ onSolve, onBack }) {
           </span>
         </div>
         <button className="dev-skip-btn" onClick={devSkip}>⚡ DEV SKIP</button>
-        <p className="pm-hint terminal-text terminal-text--dim">
-          CONNECT MATCHING CONDUIT NODES — AVOID BLOCKERS
-        </p>
-        <FlowPuzzle
-          key={circuitIdx}
-          puzzle={allPuzzles[circuitIdx]}
-          G={circuit.G}
-          colorKeys={circuit.colorKeys}
-          circuitLabel={circuit.label}
-          onCircuitSolve={sig => handleCircuitSolve(circuitIdx, sig)}
-        />
 
-        {/* ── Crew log ── */}
-        <div className="crew-log-strip">
-          <div className="crew-log-entry">
-            <div className="crew-log-meta">
-              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-              <span className="terminal-text crew-log-day">MISSION DAY 01</span>
+        <div className="pm-content">
+          {/* ── Left: crew log ── */}
+          <div className="pm-log-col">
+            <div className="crew-log-entry">
+              <div className="crew-log-meta">
+                <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+                <span className="terminal-text crew-log-day">MISSION DAY 01</span>
+              </div>
+              <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule.</p>
             </div>
-            <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule.</p>
+            <div className="crew-log-entry">
+              <div className="crew-log-meta">
+                <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+                <span className="terminal-text crew-log-day">MISSION DAY 14</span>
+              </div>
+              <p className="terminal-text crew-log-text">Power draw from LAB-07 spiked overnight. 340% above mission spec. Filed a report. Prometheus HQ replied: "Do not escalate." I am escalating anyway.</p>
+            </div>
           </div>
-          <div className="crew-log-entry">
-            <div className="crew-log-meta">
-              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-              <span className="terminal-text crew-log-day">MISSION DAY 14</span>
-            </div>
-            <p className="terminal-text crew-log-text">Power draw from LAB-07 spiked overnight. 340% above mission spec. Filed a report. Prometheus HQ replied: "Do not escalate." I am escalating anyway.</p>
+
+          {/* ── Right: circuit puzzle ── */}
+          <div className="pm-puzzle-col">
+            <p className="pm-hint terminal-text terminal-text--dim">
+              CONNECT MATCHING CONDUIT NODES — AVOID BLOCKERS
+            </p>
+            <FlowPuzzle
+              key={circuitIdx}
+              puzzle={allPuzzles[circuitIdx]}
+              G={circuit.G}
+              colorKeys={circuit.colorKeys}
+              circuitLabel={circuit.label}
+              onCircuitSolve={sig => handleCircuitSolve(circuitIdx, sig)}
+            />
           </div>
         </div>
       </div>
@@ -503,34 +515,9 @@ export default function PowerModule({ onSolve, onBack }) {
         <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
         <span className="pm-title terminal-text">MODULE 01 — POWER GRID</span>
       </div>
-      <div className="pm-solved">
-        <p className="terminal-text pm-solved__headline">
-          ✓ POWER GRID RESTORED — ALL CIRCUITS ONLINE
-        </p>
-        {showFragment && (
-          <div className="pm-fragment">
-            <p className="terminal-text pm-fragment__label">◈ MEMORY FRAGMENT 01 RECOVERED</p>
-            <div className="pm-fragment__data">
-              <span className="terminal-text">TIMESTAMP:&nbsp;</span>
-              <span className="terminal-text pm-fragment__value">2387.089 — 14:22:07</span>
-            </div>
-            <div className="pm-fragment__data">
-              <span className="terminal-text">EVENT:&nbsp;</span>
-              <span className="terminal-text pm-fragment__value">POWER LOSS — ORIGIN UNKNOWN — ALL SECTORS</span>
-            </div>
-            <div className="pm-fragment__data">
-              <span className="terminal-text">STATUS:&nbsp;</span>
-              <span className="terminal-text pm-fragment__value">ONLINE</span>
-            </div>
-            <button className="pm-confirm terminal-text" onClick={() => onSolve('ONLINE')}>
-              INTEGRATE FRAGMENT → CONTINUE
-            </button>
-          </div>
-        )}
-      </div>
-
-        {/* ── Crew log ── */}
-        <div className="crew-log-strip">
+      <div className="pm-content">
+        {/* ── Left: crew log ── */}
+        <div className="pm-log-col">
           <div className="crew-log-entry">
             <div className="crew-log-meta">
               <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
@@ -553,6 +540,36 @@ export default function PowerModule({ onSolve, onBack }) {
             <p className="terminal-text crew-log-text crew-log-text--prometheus">Crew inquiry re: LAB-07 to be suppressed. Officer Hayes flagged for monitoring. Prometheus-7 protocol: active.</p>
           </div>
         </div>
+
+        {/* ── Right: solved state ── */}
+        <div className="pm-puzzle-col">
+          <div className="pm-solved">
+            <p className="terminal-text pm-solved__headline">
+              ✓ POWER GRID RESTORED — ALL CIRCUITS ONLINE
+            </p>
+            {showFragment && (
+              <div className="pm-fragment">
+                <p className="terminal-text pm-fragment__label">◈ MEMORY FRAGMENT 01 RECOVERED</p>
+                <div className="pm-fragment__data">
+                  <span className="terminal-text">TIMESTAMP:&nbsp;</span>
+                  <span className="terminal-text pm-fragment__value">2387.089 — 14:22:07</span>
+                </div>
+                <div className="pm-fragment__data">
+                  <span className="terminal-text">EVENT:&nbsp;</span>
+                  <span className="terminal-text pm-fragment__value">POWER LOSS — ORIGIN UNKNOWN — ALL SECTORS</span>
+                </div>
+                <div className="pm-fragment__data">
+                  <span className="terminal-text">STATUS:&nbsp;</span>
+                  <span className="terminal-text pm-fragment__value">ONLINE</span>
+                </div>
+                <button className="pm-confirm terminal-text" onClick={() => onSolve('ONLINE')}>
+                  INTEGRATE FRAGMENT → CONTINUE
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
