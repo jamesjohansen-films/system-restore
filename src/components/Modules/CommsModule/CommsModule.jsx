@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './CommsModule.css'
+import HelpModal from '../../HelpModal/HelpModal'
 
 // ── Puzzle constants ───────────────────────────────────────────────────────────
 const TOLERANCE = 5   // ±5 on each 0-100 slider before a channel "locks"
@@ -39,6 +40,8 @@ function isLocked(ch, sl) {
 
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function CommsModule({ onSolve, onBack }) {
+  const [showHelp, setShowHelp] = useState(false)
+
   const [sliders, setSliders] = useState(() =>
     CHANNELS.map(() => ({ freq: 50, amp: 50 }))
   )
@@ -82,11 +85,22 @@ export default function CommsModule({ onSolve, onBack }) {
 
   return (
     <div className="comms-module">
+      {showHelp && <HelpModal
+        title="HOW TO PLAY — COMMS ARRAY"
+        steps={[
+          'Each channel has two sliders: FREQUENCY and AMPLITUDE.',
+          'Adjust both sliders until the live waveform matches the target shape. The channel locks when close enough.',
+          'Lock all 4 channels to reveal the decryption digits.',
+          'The 4 digits in channel order form the access code — enter it to unlock the array.',
+        ]}
+        onClose={() => setShowHelp(false)}
+      />}
       {!solved && <button className="dev-skip-btn" onClick={devSkip}>⚡ DEV SKIP</button>}
 
       {/* ── Header ── */}
       <div className="comms-module__header">
         <button className="cm-back terminal-text" onClick={onBack}>← BACK</button>
+        <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
         <span className="cm-title terminal-text">MODULE 02 — COMMUNICATIONS</span>
         <span className={`cm-status terminal-text ${solved ? 'cm-status--online' : ''}`}>
           {solved ? '✓ ONLINE' : '— OFFLINE'}

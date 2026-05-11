@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import './MemoryCore.css'
+import HelpModal from '../../HelpModal/HelpModal'
 
 // ── Fragment manifest ──────────────────────────────────────────────────────────
 const FRAGMENTS = [
@@ -67,6 +68,8 @@ function pad2(n) { return String(n).padStart(2, '0') }
 
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function MemoryCore({ onSolve, onBack }) {
+  const [showHelp, setShowHelp] = useState(false)
+
   // 'ready' | 'launching' | 'story' | 'countdown'
   const [phase,     setPhase]     = useState('ready')
   const [tick,      setTick]      = useState(3)
@@ -133,10 +136,21 @@ export default function MemoryCore({ onSolve, onBack }) {
 
   return (
     <div className="mc-module">
+      {showHelp && <HelpModal
+        title="HOW TO PLAY — MEMORY CORE"
+        steps={[
+          'All 4 crew memory fragments have been recovered and integrated.',
+          'Click INITIATE SYSTEM.RESTORE to begin the reconstruction sequence.',
+          'The system will reconstruct the full incident record and transmit to Earth.',
+          'Signal travel time is 6 months each way — await response.',
+        ]}
+        onClose={() => setShowHelp(false)}
+      />}
 
       {/* ── Header ── */}
       <div className="mc-header">
         <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
+        <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
         <span className="pm-title terminal-text">MODULE 05 — MEMORY CORE</span>
         <span className={`mc-status terminal-text
           ${phase === 'countdown' ? 'mc-status--unlocked' : ''}

@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import './PowerModule.css'
+import HelpModal from '../../HelpModal/HelpModal'
 
 // ── Colour palette ─────────────────────────────────────────────────────────────
 const COLOR_HEX = {
@@ -349,6 +350,8 @@ function FlowPuzzle({ puzzle, G, colorKeys, onCircuitSolve, circuitLabel, logSlo
 
 // ── Main PowerModule ───────────────────────────────────────────────────────────
 export default function PowerModule({ onSolve, onBack }) {
+  const [showHelp, setShowHelp] = useState(false)
+
   // Generate all 3 puzzles once
   const [allPuzzles] = useState(() => CIRCUITS.map(c => generatePuzzle(c)))
 
@@ -402,8 +405,19 @@ export default function PowerModule({ onSolve, onBack }) {
     ]
     return (
       <div className="power-module">
+        {showHelp && <HelpModal
+          title="HOW TO PLAY — POWER GRID"
+          steps={[
+            'PANEL COVER: Click each of the 4 screws 4 times to unthread and remove the cover.',
+            'ROUTING: Click and drag from any colored dot to draw a path to its matching color.',
+            'Paths cannot cross. Drag back over a path to erase it from that point.',
+            'Every cell must be filled. Complete all 3 circuits to restore power.',
+          ]}
+          onClose={() => setShowHelp(false)}
+        />}
         <div className="power-module__header">
           <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
+          <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
           <span className="pm-title terminal-text">MODULE 01 — POWER GRID</span>
           <span className="pm-counter terminal-text">
             SCREWS REMOVED: {screws.filter(n => n >= CLICKS_TO_REMOVE).length} / {SCREWS_COUNT}
@@ -453,8 +467,19 @@ export default function PowerModule({ onSolve, onBack }) {
     const circuit = CIRCUITS[circuitIdx]
     return (
       <div className="power-module">
+        {showHelp && <HelpModal
+          title="HOW TO PLAY — POWER GRID"
+          steps={[
+            'PANEL COVER: Click each of the 4 screws 4 times to unthread and remove the cover.',
+            'ROUTING: Click and drag from any colored dot to draw a path to its matching color.',
+            'Paths cannot cross. Drag back over a path to erase it from that point.',
+            'Every cell must be filled. Complete all 3 circuits to restore power.',
+          ]}
+          onClose={() => setShowHelp(false)}
+        />}
         <div className="power-module__header">
           <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
+          <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
           <span className="pm-title terminal-text">MODULE 01 — POWER GRID</span>
           <span className="pm-counter terminal-text">
             CIRCUIT: {circuitIdx + 1} / {CIRCUITS.length}
@@ -497,8 +522,19 @@ export default function PowerModule({ onSolve, onBack }) {
   // ── All circuits solved — show signature ──
   return (
     <div className="power-module">
+      {showHelp && <HelpModal
+        title="HOW TO PLAY — POWER GRID"
+        steps={[
+          'PANEL COVER: Click each of the 4 screws 4 times to unthread and remove the cover.',
+          'ROUTING: Click and drag from any colored dot to draw a path to its matching color.',
+          'Paths cannot cross. Drag back over a path to erase it from that point.',
+          'Every cell must be filled. Complete all 3 circuits to restore power.',
+        ]}
+        onClose={() => setShowHelp(false)}
+      />}
       <div className="power-module__header">
         <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
+        <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
         <span className="pm-title terminal-text">MODULE 01 — POWER GRID</span>
       </div>
       <div className="pm-solved">

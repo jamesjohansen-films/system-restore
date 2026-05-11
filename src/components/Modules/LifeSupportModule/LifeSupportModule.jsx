@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './LifeSupportModule.css'
+import HelpModal from '../../HelpModal/HelpModal'
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 const NUM_COLS = 6
@@ -171,6 +172,8 @@ function FragStrip({ bars }) {
 
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function LifeSupportModule({ onSolve, onBack }) {
+  const [showHelp, setShowHelp] = useState(false)
+
   const [rounds] = useState(() =>
     ROUND_DATA.map(r => {
       const correct = r.fragments.slice(0, r.slotsCount)
@@ -258,11 +261,22 @@ export default function LifeSupportModule({ onSolve, onBack }) {
 
   return (
     <div className="ls-module">
+      {showHelp && <HelpModal
+        title="HOW TO PLAY — LIFE SUPPORT"
+        steps={[
+          'You are shown a TARGET pattern — a bar chart across 6 channels.',
+          'Click fragments in the bank to add them to your selection. Their bar values stack together.',
+          'Match the combined bars exactly to the target pattern, then submit.',
+          'Complete all 3 rounds to restore life support systems.',
+        ]}
+        onClose={() => setShowHelp(false)}
+      />}
       {!solved && <button className="dev-skip-btn" onClick={devSkip}>⚡ DEV</button>}
 
       {/* Header */}
       <div className="ls-header">
         <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
+        <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
         <span className="pm-title terminal-text">MODULE 04 — LIFE SUPPORT</span>
         <span className={`ls-status terminal-text
           ${solved   ? 'ls-status--restored' : ''}

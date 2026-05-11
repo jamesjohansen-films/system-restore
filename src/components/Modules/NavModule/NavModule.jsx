@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './NavModule.css'
 import TerminalSelect from '../../TerminalSelect/TerminalSelect'
+import HelpModal from '../../HelpModal/HelpModal'
 
 // ── Map constants ─────────────────────────────────────────────────────────────
 const MAP_W = 320
@@ -534,6 +535,8 @@ function ShipAlignment3D({ onComplete }) {
 
 // ── Main NavModule ────────────────────────────────────────────────────────────
 export default function NavModule({ onSolve, onBack }) {
+  const [showHelp, setShowHelp] = useState(false)
+
   // 'tri1' | 'tri2' | 'dials' | 'done'
   const [phase,         setPhase]         = useState('tri1')
   const [transitioning, setTransitioning] = useState(false)
@@ -578,11 +581,22 @@ export default function NavModule({ onSolve, onBack }) {
 
   return (
     <div className="nav-module">
+      {showHelp && <HelpModal
+        title="HOW TO PLAY — NAVIGATION"
+        steps={[
+          'Each intercepted signal broadcasts at a specific period (T value). Find its matching pulsar in the reference catalog.',
+          'Use the dropdown under each signal card to assign it to the correct source pulsar.',
+          'Click TRIANGULATE when all 3 signals are matched. Complete the coarse scan, then the fine scan.',
+          'Finally, adjust the PITCH, YAW, and ROLL sliders until the vessel silhouette matches the ghost target.',
+        ]}
+        onClose={() => setShowHelp(false)}
+      />}
       {!transitioning && <button className="dev-skip-btn" onClick={devSkip}>⚡ DEV SKIP</button>}
 
       {/* ── Header ── */}
       <div className="nav-header">
         <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
+        <button className="help-btn terminal-text" onClick={() => setShowHelp(true)}>[ ? ]</button>
         <span className="pm-title terminal-text">MODULE 03 — NAVIGATION</span>
         <span className={`nav-status terminal-text ${statusLocked ? 'nav-status--locked' : ''}`}>
           {status}
