@@ -466,30 +466,39 @@ export default function PowerModule({ onSolve, onBack }) {
         <p className="pm-hint terminal-text terminal-text--dim">
           CONNECT MATCHING CONDUIT NODES — AVOID BLOCKERS
         </p>
-        <FlowPuzzle
-          key={circuitIdx}
-          puzzle={allPuzzles[circuitIdx]}
-          G={circuit.G}
-          colorKeys={circuit.colorKeys}
-          circuitLabel={circuit.label}
-          onCircuitSolve={sig => handleCircuitSolve(circuitIdx, sig)}
-        />
 
-        {/* ── Crew log ── */}
-        <div className="crew-log-strip">
-          <div className="crew-log-entry">
-            <div className="crew-log-meta">
-              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-              <span className="terminal-text crew-log-day">MISSION DAY 01</span>
-            </div>
-            <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule.</p>
+        <div className="pm-content">
+          {/* ── Left: log panel — one entry fills full height, replaces on progress ── */}
+          <div className="pm-log-col">
+            {circuitIdx === 0 ? (
+              <div className="crew-log-entry">
+                <div className="crew-log-meta">
+                  <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+                  <span className="terminal-text crew-log-day">MISSION DAY 01</span>
+                </div>
+                <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule. Kowalski says it is routine calibration.</p>
+              </div>
+            ) : (
+              <div className="crew-log-entry">
+                <div className="crew-log-meta">
+                  <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
+                  <span className="terminal-text crew-log-day">MISSION DAY 14</span>
+                </div>
+                <p className="terminal-text crew-log-text">Power draw from LAB-07 spiked overnight. 340% above mission spec. Filed a report. Prometheus HQ replied: "Do not escalate." I am escalating anyway.</p>
+              </div>
+            )}
           </div>
-          <div className="crew-log-entry">
-            <div className="crew-log-meta">
-              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-              <span className="terminal-text crew-log-day">MISSION DAY 14</span>
-            </div>
-            <p className="terminal-text crew-log-text">Power draw from LAB-07 spiked overnight. 340% above mission spec. Filed a report. Prometheus HQ replied: "Do not escalate." I am escalating anyway.</p>
+
+          {/* ── Right: circuit puzzle ── */}
+          <div className="pm-puzzle-col">
+            <FlowPuzzle
+              key={circuitIdx}
+              puzzle={allPuzzles[circuitIdx]}
+              G={circuit.G}
+              colorKeys={circuit.colorKeys}
+              circuitLabel={circuit.label}
+              onCircuitSolve={sig => handleCircuitSolve(circuitIdx, sig)}
+            />
           </div>
         </div>
       </div>
@@ -503,48 +512,9 @@ export default function PowerModule({ onSolve, onBack }) {
         <button className="pm-back terminal-text" onClick={onBack}>← BACK</button>
         <span className="pm-title terminal-text">MODULE 01 — POWER GRID</span>
       </div>
-      <div className="pm-solved">
-        <p className="terminal-text pm-solved__headline">
-          ✓ POWER GRID RESTORED — ALL CIRCUITS ONLINE
-        </p>
-        {showFragment && (
-          <div className="pm-fragment">
-            <p className="terminal-text pm-fragment__label">◈ MEMORY FRAGMENT 01 RECOVERED</p>
-            <div className="pm-fragment__data">
-              <span className="terminal-text">TIMESTAMP:&nbsp;</span>
-              <span className="terminal-text pm-fragment__value">2387.089 — 14:22:07</span>
-            </div>
-            <div className="pm-fragment__data">
-              <span className="terminal-text">EVENT:&nbsp;</span>
-              <span className="terminal-text pm-fragment__value">POWER LOSS — ORIGIN UNKNOWN — ALL SECTORS</span>
-            </div>
-            <div className="pm-fragment__data">
-              <span className="terminal-text">STATUS:&nbsp;</span>
-              <span className="terminal-text pm-fragment__value">ONLINE</span>
-            </div>
-            <button className="pm-confirm terminal-text" onClick={() => onSolve('ONLINE')}>
-              INTEGRATE FRAGMENT → CONTINUE
-            </button>
-          </div>
-        )}
-      </div>
-
-        {/* ── Crew log ── */}
-        <div className="crew-log-strip">
-          <div className="crew-log-entry">
-            <div className="crew-log-meta">
-              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-              <span className="terminal-text crew-log-day">MISSION DAY 01</span>
-            </div>
-            <p className="terminal-text crew-log-text">All systems nominal. The Prometheus research team has taken over LAB-07 ahead of schedule.</p>
-          </div>
-          <div className="crew-log-entry">
-            <div className="crew-log-meta">
-              <span className="terminal-text crew-log-who">◈ LOG — HAYES</span>
-              <span className="terminal-text crew-log-day">MISSION DAY 14</span>
-            </div>
-            <p className="terminal-text crew-log-text">Power draw from LAB-07 spiked 340% above mission spec. Filed a report. Prometheus HQ: "Do not escalate."</p>
-          </div>
+      <div className="pm-content">
+        {/* ── Left: Prometheus intercept replaces Hayes logs ── */}
+        <div className="pm-log-col">
           <div className="crew-log-entry crew-log-entry--prometheus">
             <div className="crew-log-meta">
               <span className="terminal-text crew-log-who crew-log-who--prometheus">◈ PROMETHEUS INTERNAL — RECOVERED</span>
@@ -553,6 +523,36 @@ export default function PowerModule({ onSolve, onBack }) {
             <p className="terminal-text crew-log-text crew-log-text--prometheus">Crew inquiry re: LAB-07 to be suppressed. Officer Hayes flagged for monitoring. Prometheus-7 protocol: active.</p>
           </div>
         </div>
+
+        {/* ── Right: solved state ── */}
+        <div className="pm-puzzle-col">
+          <div className="pm-solved">
+            <p className="terminal-text pm-solved__headline">
+              ✓ POWER GRID RESTORED — ALL CIRCUITS ONLINE
+            </p>
+            {showFragment && (
+              <div className="pm-fragment">
+                <p className="terminal-text pm-fragment__label">◈ MEMORY FRAGMENT 01 RECOVERED</p>
+                <div className="pm-fragment__data">
+                  <span className="terminal-text">TIMESTAMP:&nbsp;</span>
+                  <span className="terminal-text pm-fragment__value">2387.089 — 14:22:07</span>
+                </div>
+                <div className="pm-fragment__data">
+                  <span className="terminal-text">EVENT:&nbsp;</span>
+                  <span className="terminal-text pm-fragment__value">POWER LOSS — ORIGIN UNKNOWN — ALL SECTORS</span>
+                </div>
+                <div className="pm-fragment__data">
+                  <span className="terminal-text">STATUS:&nbsp;</span>
+                  <span className="terminal-text pm-fragment__value">ONLINE</span>
+                </div>
+                <button className="pm-confirm terminal-text" onClick={() => onSolve('ONLINE')}>
+                  INTEGRATE FRAGMENT → CONTINUE
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
