@@ -599,16 +599,25 @@
 
 .nav-dials-confirm {
   font-size: 0.82rem;
-  color: #00ff88;
+  color: #00d46a;
   letter-spacing: 0.1em;
   text-align: center;
-  text-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+  text-shadow: 0 0 8px rgba(0, 212, 106, 0.45);
   padding: 8px;
-  border: 1px solid #003322;
-  background: rgba(0, 20, 12, 0.2);
+  border: 1px solid #00a858;
+  background: rgba(0, 168, 88, 0.1);
+  box-shadow: 0 0 10px rgba(0, 168, 88, 0.15);
   animation: nav-fade-in 0.5s ease-out;
   flex-shrink: 0;
+  cursor: pointer; --cursor-hot: 1;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
+.nav-dials-confirm:hover {
+  background: rgba(0, 168, 88, 0.2);
+  border-color: #00d46a;
+  box-shadow: 0 0 20px rgba(0, 168, 88, 0.35);
+}
+.nav-dials-confirm:active { transform: scale(0.97); }
 
 /* ── ShipAlignment3D ── */
 .nav-align-wrap {

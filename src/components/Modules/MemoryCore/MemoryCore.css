@@ -416,22 +416,26 @@
 
 .mc-confirm {
   margin-top: 6px;
-  background: none;
-  border: 1px solid #2a4a88;
-  color: #00dfd8;
+  background: rgba(0, 168, 88, 0.1);
+  border: 1px solid #00a858;
+  color: #00d46a;
   font-family: var(--font-terminal);
   font-size: 0.85rem;
   letter-spacing: 0.14em;
   padding: 5px 14px;
   cursor: pointer; --cursor-hot: 1;
   align-self: flex-start;
-  transition: background 0.2s, border-color 0.2s;
+  text-shadow: 0 0 8px rgba(0, 212, 106, 0.45);
+  box-shadow: 0 0 10px rgba(0, 168, 88, 0.15);
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
 .mc-confirm:hover {
-  background: rgba(0, 223, 216, 0.08);
-  border-color: rgba(0, 223, 216, 0.5);
+  background: rgba(0, 168, 88, 0.2);
+  border-color: #00d46a;
+  box-shadow: 0 0 20px rgba(0, 168, 88, 0.35);
 }
+.mc-confirm:active { transform: scale(0.97); }
 
 /* ── Launch screen ── */
 .mc-body--launch {
