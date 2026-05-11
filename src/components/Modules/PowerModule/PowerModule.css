@@ -58,16 +58,6 @@
   flex-shrink: 0;
 }
 
-/* ── Circuit header — label + hint above the log/grid row ── */
-.pm-circuit-header {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  flex-shrink: 0;
-  padding-bottom: 3px;
-  border-bottom: 1px solid #0d0d0d;
-}
-
 /* ── Content row: log sidebar (left) + puzzle (right) ── */
 .pm-content {
   display: flex;

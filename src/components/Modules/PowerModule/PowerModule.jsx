@@ -166,7 +166,7 @@ function Screw({ turns, onClick, removed }) {
 }
 
 // ── Flow puzzle renderer (shared across all 3 circuits) ────────────────────────
-function FlowPuzzle({ puzzle, G, colorKeys, onCircuitSolve, circuitLabel, hideLabel = false }) {
+function FlowPuzzle({ puzzle, G, colorKeys, onCircuitSolve, circuitLabel }) {
   const { endpoints, obs, obsTypes } = puzzle
   const epMap   = buildEpMap(endpoints)
   const [paths, setPaths] = useState({})
@@ -276,7 +276,7 @@ function FlowPuzzle({ puzzle, G, colorKeys, onCircuitSolve, circuitLabel, hideLa
 
   return (
     <div className="pm-circuit">
-      {!hideLabel && <div className="pm-circuit__label terminal-text">{circuitLabel}</div>}
+      <div className="pm-circuit__label terminal-text">{circuitLabel}</div>
       <span className={`pm-counter terminal-text ${completedCount === colorKeys.length ? 'pm-counter--clear' : ''}`}>
         ROUTED: {completedCount} / {colorKeys.length}
       </span>
@@ -455,14 +455,6 @@ export default function PowerModule({ onSolve, onBack }) {
         </div>
         <button className="dev-skip-btn" onClick={devSkip}>⚡ DEV SKIP</button>
 
-        {/* Label + hint sit above the log/grid row so the log starts below them */}
-        <div className="pm-circuit-header">
-          <p className="pm-hint terminal-text terminal-text--dim">
-            CONNECT MATCHING CONDUIT NODES — AVOID BLOCKERS
-          </p>
-          <div className="pm-circuit__label terminal-text">{circuit.label}</div>
-        </div>
-
         <div className="pm-content">
           {/* ── Left: single log entry — replaces as circuits progress ── */}
           <div className="pm-log-col">
@@ -485,15 +477,17 @@ export default function PowerModule({ onSolve, onBack }) {
             )}
           </div>
 
-          {/* ── Right: circuit puzzle (label already rendered above) ── */}
+          {/* ── Right: circuit puzzle ── */}
           <div className="pm-puzzle-col">
+            <p className="pm-hint terminal-text terminal-text--dim">
+              CONNECT MATCHING CONDUIT NODES — AVOID BLOCKERS
+            </p>
             <FlowPuzzle
               key={circuitIdx}
               puzzle={allPuzzles[circuitIdx]}
               G={circuit.G}
               colorKeys={circuit.colorKeys}
               circuitLabel={circuit.label}
-              hideLabel={true}
               onCircuitSolve={sig => handleCircuitSolve(circuitIdx, sig)}
             />
           </div>
