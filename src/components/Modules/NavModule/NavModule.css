@@ -671,7 +671,7 @@
   gap: 14px;
   flex: 1;
   min-height: 0;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 /* ── 3D viewer ── */
@@ -680,20 +680,23 @@
   flex-direction: column;
   gap: 5px;
   flex-shrink: 0;
+  width: min(260px, 28%);
 }
 
 .nav-3d-label {
   font-size: 0.62rem;
   letter-spacing: 0.1em;
   color: #4e6a98;
+  flex-shrink: 0;
 }
 
 .nav-3d-svg {
-  width: 160px;
-  height: 160px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   display: block;
   border: 1px solid #0e1428;
   border-radius: 3px;
+  flex-shrink: 0;
 }
 
 .nav-3d-locked {
@@ -703,6 +706,7 @@
   text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
   animation: nav-fade-in 0.4s ease-out;
   text-align: center;
+  flex-shrink: 0;
 }
 
 /* ── Axis control cards ── */
@@ -711,17 +715,20 @@
   flex-direction: column;
   gap: 8px;
   flex: 1;
-  justify-content: center;
+  min-height: 0;
 }
 
 .nav-axis-card {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 8px 10px;
+  justify-content: space-around;
+  gap: 0;
+  padding: 12px 14px;
   border: 1px solid #111820;
   background: rgba(5, 8, 20, 0.3);
   transition: border-color 0.4s;
+  flex: 1;
+  min-height: 0;
 }
 
 .nav-axis-card--locked {
